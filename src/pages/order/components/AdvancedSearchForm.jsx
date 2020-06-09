@@ -384,6 +384,7 @@ const AdvancedSearchForm = (props) => {
             companyOptions={props.companyOptions}
             bankOptions={props.bankOptions}
             customerOptions={props.customerOptions}
+            destroyOnClose={1==1}
           />
         </Form>
       </div>

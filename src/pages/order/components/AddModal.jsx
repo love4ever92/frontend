@@ -11,7 +11,8 @@ const AddModal = (props) => {
     const [form] = Form.useForm();
     const [maskClosable,] = useState(false);
     const [isSubmit, setIsSubmit] = useState(true);
-
+    const [companyOptions, setCompanyOptions] = useState([]);
+    
 
 
     const timeOut = (m) => {
@@ -46,7 +47,8 @@ const AddModal = (props) => {
                 message.info('创建订单成功！');
                 timeOut(20000);
                 props.setVisible(false);
-                
+                form.resetFields();
+                setIsSubmit(true);
             } else {
                 message.error(res.data ? res.data : "添加失败，原因不明，请联系维护人员");
                 setIsSubmit(true);
@@ -92,48 +94,57 @@ const AddModal = (props) => {
                                             customerName: form.getFieldValue('customerId').split(":")[1],
                                         }
                                         // 添加
-                                        add(data);
+                                        Modal.confirm({
+                                            title: '新增订单',
+                                            content: '确定添加订单',
+                                            onOk () {
+                                                add(data);
+                                                setIsSubmit(true);
+                                            }
+                                        })
+                                        setIsSubmit(true);
                                     } else {
                                         setIsSubmit(true);
                                         Modal.confirm({
                                             title: '新增订单',
                                             content: '已收金额大于小款金额，输入有误，请重新输入！',
                                         })
+                                        
                                     }
 
                                 } else {
                                     setIsSubmit(true);
                                     Modal.confirm({
                                         title: '新增订单',
-                                        content: '已收金额输入有误（只能是数字或小数），请重新输入！',
+                                        content: '已收金额输入有误（只能是数字），请重新输入！',
                                     })
                                 }
                             } else {
                                 setIsSubmit(true);
                                 Modal.confirm({
                                     title: '新增订单',
-                                    content: '其他费用输入有误（只能是数字或小数），请重新输入！',
+                                    content: '其他费用输入有误（只能是数字），请重新输入！',
                                 })
                             }
                         } else {
                             setIsSubmit(true);
                             Modal.confirm({
                                 title: '新增订单',
-                                content: '小款金额输入有误（只能是数字或小数），请重新输入！',
+                                content: '小款金额输入有误（只能是数字），请重新输入！',
                             })
                         }
                     } else {
                         setIsSubmit(true);
                         Modal.confirm({
                             title: '新增订单',
-                            content: '小款点位输入有误（只能是数字或小数），请重新输入！',
+                            content: '小款点位输入有误（只能是数字），请重新输入！',
                         })
                     }
                 } else {
                     setIsSubmit(true);
                     Modal.confirm({
                         title: '新增订单',
-                        content: '下款金额输入有误（只能是数字或小数），请重新输入！',
+                        content: '下款金额输入有误（只能是数字），请重新输入！',
                     })
                 }
                 // }else{
@@ -160,6 +171,30 @@ const AddModal = (props) => {
     function onChange(value) {
         console.log(`selected ${value}`);
         console.log(form.getFieldValue('isGet'));
+    }
+
+    async function  onChange4Customer (value) {
+        
+        try {
+            const res = await request.get('/api/base/company/getOne', {
+              params: {
+                userId: localStorage.getItem('userId'),
+                customerId: value.split(":")[0],
+              },
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            })
+            if (res.code === '0000') {
+                let a = [];
+                a.push(res.data);
+                setCompanyOptions(a);
+            }
+          } catch (error) {
+            console.log(111, error);
+          }     
+        
     }
 
     function onBlur() {
@@ -274,7 +309,7 @@ const AddModal = (props) => {
                                     showSearch
                                     placeholder="请选择"
                                     optionFilterProp="children"
-                                    onChange={onChange}
+                                    onChange={onChange4Customer}
                                     onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
@@ -405,7 +440,7 @@ const AddModal = (props) => {
                                     }
                                 >
                                     <Select.Option disabled key='0' value='0'>请选择</Select.Option>
-                                    {props.companyOptions.map(v => {
+                                    {companyOptions.map(v => {
                                         return (<Select.Option key={v.id} value={`${v.id}:${v.name}`}>{v.name}</Select.Option>);
                                     })}
                                 </Select>
@@ -535,7 +570,7 @@ const AddModal = (props) => {
                         <Col span={8}>
                             <Form.Item
                                 name="getMoney"
-                                label="已收金额"
+                                label="已收金额(￥)"
                                 rules={[
                                     {
                                         required: true,
@@ -548,7 +583,37 @@ const AddModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={24}>
+                        <Col span={8} >
+                            <Form.Item
+                                name="needInvoice"
+                                label="是否开票"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请选择',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+
+                                >
+                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
+                                    <Select.Option key={1} value="是">是</Select.Option>
+                                    <Select.Option key={2} value="否">否</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={16}>
                             <Form.Item
                                 name="remark"
                                 label="备注"

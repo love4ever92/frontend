@@ -52,7 +52,7 @@ export default defineConfig({
     {
       path: '/',
       component: '../layouts/SecurityLayout',
-      authority: ['管理员','部门经理','员工','财务'],
+      authority: ['管理员','部门经理','员工','财务经理', '会计', '出纳'],
       routes: [
         {
           path: '/',
@@ -61,7 +61,7 @@ export default defineConfig({
             {
               path: '/',
               redirect: '/user_info',
-              authority: ['管理员','部门经理','员工','财务'],
+              authority: ['管理员','部门经理','员工','财务经理', '会计',  '出纳'],
             },
             {
               path: '/admin',
@@ -84,7 +84,7 @@ export default defineConfig({
               icon: 'table',
               path: '/user_info',
               component: './user_info',
-              authority: ['管理员','部门经理','员工','财务'],
+              authority: ['管理员','部门经理','员工','财务经理', '会计', '出纳'],
             },
             {
               name: '员工管理',
@@ -127,7 +127,7 @@ export default defineConfig({
               icon: 'table',
               path: '/order',
               component: './order',
-              authority: ['管理员','部门经理','员工','财务'],
+              authority: ['管理员','部门经理','员工','财务经理', '会计', '出纳'],
             },
             // {
             //   name: '创建订单',

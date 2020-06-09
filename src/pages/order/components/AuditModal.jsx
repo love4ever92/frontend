@@ -31,7 +31,7 @@ const EditModal = (props) => {
             const phoneStaffId = `${props.editObj.phoneStaffId}:${props.editObj.phoneStaff}`;
             const helpStaffId = `${props.editObj.helpStaffId}:${props.editObj.helpStaff}`;
             const customerId = `${props.editObj.customerId}:${props.editObj.customerName}`;
-
+            
             form.setFieldsValue({
                 ...props.editObj,
                 operatTime: moment(props.editObj.operatTime, 'YYYY-MM-DD'),
@@ -45,11 +45,15 @@ const EditModal = (props) => {
                 customerId,
             })
             if(props.type == 'confirm'){
-                document.getElementById("btn3").style.display="none";
-                document.getElementById("btn4").style.display="none";
-            }else{
-                document.getElementById("btn1").style.display="none";
-                document.getElementById("btn2").style.display="none";
+                document.getElementById("confirm").style.display="block";
+            }else if(props.type == 'finance'){
+                document.getElementById("finance").style.display="block";
+            }else if(props.type == 'teller'){
+                document.getElementById("teller").style.display="block";
+            }else if(props.type == 'financeManager'){
+                document.getElementById("financeManager").style.display="block";
+            }else if(props.type == 'countersign'){
+                document.getElementById("confirmCountersign").style.display="block";
             }
             
 
@@ -60,7 +64,7 @@ const EditModal = (props) => {
     const handleCancel = () => {
         Modal.confirm({
             title: '关闭订单详情',
-            content: '确定取消添加订单',
+            content: '确定关闭订单',
             onOk() {
                 props.setVisible(false);
             },
@@ -70,8 +74,80 @@ const EditModal = (props) => {
         })
     }
 
+    
+     /**
+     * 业务会签确认
+     * @param {} params 
+     */
+    const confirmCountersign = (params) =>{
+        request.get('/api/base/order/confirmCountersign', {
+            params,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        }).then(res => {
+            if (res.code && res.code === '0000') {
+                message.info('确认提交成功');
+                timeOut(20000);
+                props.setVisible(false);
+            }else{
+                setIsSubmit(true);
+                message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+            }
+        })
+    }
+
+
     /**
-     * 财务负责人确认
+     * 财务经理确认
+     * @param {} params 
+     */
+    const financeManager = (params) =>{
+        request.get('/api/base/order/financeManager', {
+            params,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        }).then(res => {
+            if (res.code && res.code === '0000') {
+                message.info('确认提交成功');
+                timeOut(20000);
+                props.setVisible(false);
+            }else{
+                setIsSubmit(true);
+                message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+            }
+        })
+    }
+
+
+     /**
+     * 出纳确认
+     * @param {} params 
+     */
+    const teller = (params) =>{
+        request.get('/api/base/order/teller', {
+            params,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        }).then(res => {
+            if (res.code && res.code === '0000') {
+                message.info('确认提交成功');
+                timeOut(20000);
+                props.setVisible(false);
+            }else{
+                setIsSubmit(true);
+                message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+            }
+        })
+    }
+
+    /**
+     * 会计确认
      * @param {} params 
      */
     const finance = (params) =>{
@@ -83,12 +159,12 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('审核提交成功');
+                message.info('确认提交成功');
                 timeOut(20000);
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
-                message.error(res.data ? res.data:"审核提交成功失败，原因不明，请联系维护人员");
+                message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
             }
         })
     }
@@ -106,12 +182,12 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('审核提交成功');
+                message.info('确认提交成功');
                 timeOut(20000);
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
-                message.error(res.data ? res.data : "审核提交成功失败，原因不明，请联系维护人员");
+                message.error(res.data ? res.data : "确认提交失败，原因不明，请联系维护人员");
             }
         })
     }
@@ -120,8 +196,8 @@ const EditModal = (props) => {
         if(isSubmit){
             setIsSubmit(false);
             if(props.type == "confirm"){
+                // 业务确认
                 const params={
-                    
                     orderId: form.getFieldValue('key'),
                     userId: localStorage.getItem('userId'),
                     confirmOpinion: form.getFieldValue('confirmOpinion'),
@@ -130,16 +206,32 @@ const EditModal = (props) => {
                 }
                 if(form.getFieldValue('confirmOpinion')=="不同意"){
                     if(form.getFieldValue('confirmReason')){
-                        confirm(params);
+                        Modal.confirm({
+                            title: '业务负责人确认订单',
+                            content: '确认提交确认！',
+                            onOk () {
+                                confirm(params);
+                                setIsSubmit(true);
+                            }
+                        })
+                        
                     }else{
                         setIsSubmit(true);
                         message.error("审核结果不同意，应该输入审核意见！");
                     }
                 }else{
-                    confirm(params);
+                    Modal.confirm({
+                        title: '业务负责人确认订单',
+                        content: '确认提交确认！',
+                        onOk () {
+                            confirm(params);
+                            setIsSubmit(true);
+                        }
+                    })
                 }
                 setIsSubmit(true);
             }else if(props.type == "finance"){
+                // 财务助理确认
                 const params={
                     orderId: form.getFieldValue('key'),
                     userId: localStorage.getItem('userId'),
@@ -149,25 +241,174 @@ const EditModal = (props) => {
                 }
                 if(form.getFieldValue('financeOpinion')=="不同意"){
                     if(form.getFieldValue('financeReason')){
-                        finance(params);
+                        Modal.confirm({
+                            title: '会计确认订单',
+                            content: '确认提交确认！',
+                            onOk () {
+                                finance(params);
+                                setIsSubmit(true);
+                            }
+                        })
                     }else{
                         setIsSubmit(true);
                         message.error("审核结果不同意，应该输入审核意见！");
                     }
                 }else{
-                    finance(params);
+                    Modal.confirm({
+                        title: '会计确认订单',
+                        content: '确认提交确认！',
+                        onOk () {
+                            finance(params);
+                            setIsSubmit(true);
+                        }
+                    })
+                    setIsSubmit(true);
                 }
-            }else{
+            }else if(props.type == "teller"){
+                // 出纳确认
+                const params={
+                    orderId: form.getFieldValue('key'),
+                    userId: localStorage.getItem('userId'),
+                    tellerOpinion: form.getFieldValue('tellerOpinion'),
+                    tellerStaff: form.getFieldValue('tellerStaff'),
+                    tellerReason: form.getFieldValue('tellerReason'),
+                }
+                if(form.getFieldValue('tellerOpinion')=="不同意"){
+                    if(form.getFieldValue('tellerReason')){
+                        Modal.confirm({
+                            title: '出纳确认订单',
+                            content: '确认提交确认！',
+                            onOk () {
+                                teller(params);
+                                setIsSubmit(true);
+                            }
+                        })
+                    }else{
+                        setIsSubmit(true);
+                        message.error("审核结果不同意，应该输入审核意见！");
+                    }
+                }else{
+                    Modal.confirm({
+                        title: '出纳确认订单',
+                        content: '确认提交确认！',
+                        onOk () {
+                            teller(params);
+                            setIsSubmit(true);
+                        }
+                    })
+                }
                 setIsSubmit(true);
+            }else if(props.type == "financeManager"){
+                // 财务经理确认
+                const params={
+                    orderId: form.getFieldValue('key'),
+                    userId: localStorage.getItem('userId'),
+                    financeManagerOpinion: form.getFieldValue('financeManagerOpinion'),
+                    financeManagerStaff: form.getFieldValue('financeManagerStaff'),
+                    financeManagerReason: form.getFieldValue('financeManagerReason'),
+                }
+                if(form.getFieldValue('financeManagerOpinion')=="不同意"){
+                    if(form.getFieldValue('financeManagerReason')){
+                        Modal.confirm({
+                            title: '财务经理确认订单',
+                            content: '确认提交确认！',
+                            onOk () {
+                                financeManager(params);
+                                setIsSubmit(true);
+                            }
+                        })
+                    }else{
+                        setIsSubmit(true);
+                        message.error("审核结果不同意，应该输入审核意见！");
+                    }
+                }else{
+                    Modal.confirm({
+                        title: '财务经理确认订单',
+                        content: '确认提交确认！',
+                        onOk () {
+                            financeManager(params);
+                            setIsSubmit(true);
+                        }
+                    })
+                }
+                setIsSubmit(true);
+            }else if(props.type == "countersign"){
+                // 业务会签确认
+                const params={
+                    orderId: form.getFieldValue('key'),
+                    userId: localStorage.getItem('userId'),
+                    confirmCountersignOpinion: form.getFieldValue('confirmCountersignOpinion'),
+                    confirmCountersignStaff: form.getFieldValue('confirmCountersignStaff'),
+                    confirmCountersignReason: form.getFieldValue('confirmCountersignReason'),
+                }
+                if(form.getFieldValue('confirmCountersignOpinion')=="不同意"){
+                    if(form.getFieldValue('confirmCountersignReason')){
+                        Modal.confirm({
+                            title: '业务负责人会签订单',
+                            content: '确认提交确认！',
+                            onOk () {
+                                confirmCountersign(params);
+                                setIsSubmit(true);
+                            }
+                        })
+                    }else{
+                        setIsSubmit(true);
+                        message.error("审核结果不同意，应该输入审核意见！");
+                    }
+                }else{
+                    Modal.confirm({
+                        title: '业务负责人会签订单',
+                        content: '确认提交确认！',
+                        onOk () {
+                            confirmCountersign(params);
+                            setIsSubmit(true);
+                        }
+                    })
+                }
+                setIsSubmit(true);
+            }else{
+                message.error("操作太频繁，请稍后20秒再试！！");
             }
-            setIsSubmit(true);
-        }else{
-            message.error("操作太频繁，请稍后20秒再试！！");
         }
-        
     }
 
-
+    const countersign = () => {
+        // 业务负责人发起会签
+        let confirmCountersignStaffPlan
+        if(localStorage.getItem("userName") === "孙克辉"){
+            confirmCountersignStaffPlan = "吴剑萍"
+        }else{
+            confirmCountersignStaffPlan = "孙克辉" 
+        }
+        const params={
+            orderId: form.getFieldValue('key'),
+            confirmCountersignStaffPlan: confirmCountersignStaffPlan,
+            userId: localStorage.getItem('userId'),
+        }
+        Modal.confirm({
+            title: '发起订单会签',
+            content: `是否邀请${confirmCountersignStaffPlan}会签？`,
+            onOk () {
+                request.get('/api/base/order/countersign', {
+                    params,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                }).then(res => {
+                    if (res.code && res.code === '0000') {
+                        message.info('确认提交成功');
+                        timeOut(20000);
+                        props.setVisible(false);
+                    }else{
+                        setIsSubmit(true);
+                        message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+                    }
+                })
+                setIsSubmit(true);
+            }     
+        })
+    }
 
     function onChange(value) {
         console.log(`selected ${value}`);
@@ -202,8 +443,6 @@ const EditModal = (props) => {
             >
                 <Form
                     form={form}
-                    // name=""
-                    // className=""
                     onFinish={onFinish}
                 >
                     <Row gutter={24}>
@@ -488,18 +727,48 @@ const EditModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                    <Col span={24}>
+                        <Col span={8} >
+                            <Form.Item
+                                name="needInvoice"
+                                label="是否开票"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请选择',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled
+                                >
+                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
+                                    <Select.Option key={1} value="是">是</Select.Option>
+                                    <Select.Option key={2} value="否">否</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={16}>
                             <Form.Item
                                 name="remark"
                                 label="备注"
                             >
-                                <Input  disabled/>
+                                <Input placeholder="备注" disabled />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="createUserName2"
                                 label="填表人"
@@ -509,9 +778,87 @@ const EditModal = (props) => {
                             </Form.Item>
                         </Col>
                     </Row>
+                    <Divider  />
+                    <Row gutter={24}  >
+                        <Col span={6}>
+                            <Form.Item
+                                name="confirmCountersignStaff"
+                                label="业务会签"
+                                rules={[
+                                    {
+                                        required: props.type==="countersign",
+                                        message: '业务会签签名',
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="签名"  disabled={ props.type!=="countersign" } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="confirmCountersignOpinion"
+                                label="会签结果"
+                                rules={[
+                                    {
+                                        required: props.type==="countersign",
+                                        message: '请选择',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={ props.type!=="countersign" }
+                                >
+                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12} >
+                            <Form.Item
+                                name="confirmCountersignReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见" 
+                                    disabled={ props.type!=="countersign" } />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={24}  style={ { display:"none" }  } id = 'confirmCountersign' >
+                        <Col span={8}>
+                            <Button  
+                                style={{
+                                marginLeft: 8,
+                            }}
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                提交
+                            </Button>
+                            <Button
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={handleCancel}
+                            >
+                                取消
+                            </Button>
+                        </Col>
+                    </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="confirmStaff"
                                 label="业务负责人"
@@ -522,10 +869,10 @@ const EditModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="业务负责人签名"  disabled={props.type==="finance" } />
+                                <Input placeholder="签名"  disabled={props.type!=="confirm" } />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="confirmOpinion"
                                 label="确认结果"
@@ -547,17 +894,36 @@ const EditModal = (props) => {
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
-                                    disabled={props.type==="finance" }
+                                    disabled={props.type!=="confirm" }
                                 >
-                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
                                     <Select.Option key={1} value="同意">同意</Select.Option>
                                     <Select.Option key={2} value="不同意">不同意</Select.Option>
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="confirmReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见" disabled={props.type!=="confirm" } />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={24} style={ { display:"none" }  } id = 'confirm' >
+                        <Col span={12}>
                             <Button 
-                                id="btn1"
+                                onClick={countersign}
+                                style={{
+                                marginLeft: 8,
+                            }}
+                                type="primary"
+                                disabled = { form.getFieldValue('confirmCountersignOpinion') == "同意"}
+                            >
+                                会签
+                            </Button>
+                            <Button 
+                                
                                 style={{
                                 marginLeft: 8,
                             }}
@@ -567,7 +933,6 @@ const EditModal = (props) => {
                                 提交
                             </Button>
                             <Button
-                                id="btn2"
                                 style={{
                                     marginLeft: 8,
                                 }}
@@ -578,33 +943,23 @@ const EditModal = (props) => {
                             </Button>
                         </Col>
                     </Row>
-                    <Row gutter={24}>
-                    <Col span={24}>
-                            <Form.Item
-                                name="confirmReason"
-                                label="处理意见"
-                            >
-                                <Input placeholder="处理意见" disabled={props.type==="finance" } />
-                            </Form.Item>
-                        </Col>
-                    </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="financeStaff"
-                                label="财务负责人"
+                                label="会计确认"
                                 rules={[
                                     {
                                         required: props.type==="finance",
-                                        message: '财务负责人签名',
+                                        message: '会计确认签名',
                                     },
                                 ]}
                             >
-                                <Input  placeholder="财务负责人签名" disabled={ props.type==="confirm" } />
+                                <Input  placeholder="签名" disabled={ props.type!=="finance" } />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="financeOpinion"
                                 label="确认结果"
@@ -627,17 +982,25 @@ const EditModal = (props) => {
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
-                                    disabled={props.type==="confirm" }
+                                    disabled={ props.type!=="finance" }
                                 >
-                                    <Select.Option key={0} disabled value="0">请选择</Select.Option>
                                     <Select.Option key={1} value="同意">同意</Select.Option>
                                     <Select.Option key={2} value="不同意">不同意</Select.Option>
                                 </Select>
                             </Form.Item>
                         </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="financeReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见"  disabled={ props.type!=="finance" }/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row style={ { display:"none" }  } id = 'finance' >
                         <Col span={8}>
                             <Button 
-                                id="btn3"
                                 style={{
                                     marginLeft: 8,
                                 }}
@@ -647,7 +1010,6 @@ const EditModal = (props) => {
                                 提交
                             </Button>
                             <Button
-                                id="btn4"
                                 style={{
                                     marginLeft: 8,
                                 }}
@@ -658,14 +1020,160 @@ const EditModal = (props) => {
                             </Button>
                         </Col>
                     </Row>
-                    <Row gutter={24}>
-                    <Col span={24}>
+                    <Divider />
+                    <Row gutter={24} >
+                        <Col span={6}>
                             <Form.Item
-                                name="financeReason"
+                                name="tellerStaff"
+                                label="出纳确认"
+                                rules={[
+                                    {
+                                        required: props.type==="teller",
+                                        message: '出纳确认签名',
+                                    },
+                                ]}
+                            >
+                                <Input  placeholder="签名" disabled={ props.type!=="teller"  } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="tellerOpinion"
+                                label="确认结果"
+                                rules={[
+                                    {
+                                        required: props.type==="teller",
+                                        message: '请选择',
+                                    },
+                                ]}
+                                
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={props.type!=="teller" }
+                                >
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="tellerReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见"  disabled={props.type === "confirm" }/>
+                                <Input placeholder="处理意见"  disabled={props.type !== "teller" }/>
                             </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row style={ { display:"none" }  } id = 'teller'> 
+                        <Col span={8}>
+                            <Button 
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                提交
+                            </Button>
+                            <Button
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={handleCancel}
+                            >
+                                取消
+                            </Button>
+                        </Col>
+                        
+                    </Row>
+                    <Divider />
+                    <Row gutter={24}>
+                        <Col span={6}>
+                            <Form.Item
+                                name="financeManagerStaff"
+                                label="财务经理确认"
+                                rules={[
+                                    {
+                                        required: props.type==="financeManager",
+                                        message: '财务经理签名',
+                                    },
+                                ]}
+                            >
+                                <Input  placeholder="签名" disabled={ props.type!=="financeManager" } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="financeManagerOpinion"
+                                label="确认结果"
+                                rules={[
+                                    {
+                                        required: props.type==="financeManager",
+                                        message: '请选择',
+                                    },
+                                ]}
+                                
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={props.type!=="financeManager" }
+                                >
+                                    
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="financeManagerReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见"  disabled={props.type !== "financeManager" }/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row style={ { display:"none" }  }  id = 'financeManager'>    
+                        <Col span={8}>
+                            <Button 
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                提交
+                            </Button>
+                            <Button
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={handleCancel}
+                            >
+                                取消
+                            </Button>
                         </Col>
                     </Row>
                 </Form>

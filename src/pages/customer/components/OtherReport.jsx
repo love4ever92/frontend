@@ -6,7 +6,7 @@ import EditableTable from './EditableTable';
 
 
 
-const CustomerReport = (props) => {
+const OtherReport = (props) => {
 
     const [form] = Form.useForm()
 
@@ -15,22 +15,12 @@ const CustomerReport = (props) => {
     const [ isSubmit, setIsSubmit ] = useState(true);
 
 
-    
-
-
     useEffect(() => {
-        
+        console.log(1,props.editObj.reportDate);
         form.setFieldsValue({ ...form.getFieldsValue(),
             name: props.editObj.customerName,
             reportDate:  props.editObj.reportDate?moment(props.editObj.reportDate, 'YYYY-MM-DD'):null,
         })
-        if(props.editObj.id){
-            setCustomerReportId(props.editObj.id);
-            setAddreportStatus(true);
-        }
-        if(props.editObj.modalType === 'look'){
-            setAddreportStatus(true)
-        }
     }, [props.editObj])
 
 
@@ -38,8 +28,8 @@ const CustomerReport = (props) => {
 
     const handleCancel = () => {
         Modal.confirm({
-            title: '客户信用报告',
-            content: '确定停止客户信用资料和企业信用报告',
+            title: '添加客户信用资料',
+            content: '确定取消添加客户信用资料',
             onOk() {
                 props.setVisible();
                 form.resetFields();
@@ -50,7 +40,7 @@ const CustomerReport = (props) => {
         })
     }
 
-    const nextStep = () => {
+    const onFinish = () => {
         if(isSubmit){
             setIsSubmit(false);
             if(props.modalType === 'add'){
@@ -142,7 +132,7 @@ const CustomerReport = (props) => {
                     form={form}
                     // name=""
                     // className=""
-                    // onFinish={onFinish}
+                    onFinish={onFinish}
                 >
                     <Row>
                         <h2>报告基本信息</h2>
@@ -153,7 +143,15 @@ const CustomerReport = (props) => {
                                 name="reportDate"
                                 label="报告日期："
                             >
-                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
+                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus || props.modalType==='look'}/>
+                            </Form.Item>
+                        </Col>
+                        <Col span={5} >
+                            <Form.Item
+                                name="name"
+                                label="关系"
+                            >
+                                <Input placeholder="关系"  disabled/>
                             </Form.Item>
                         </Col>
                         <Col span={5} >
@@ -165,24 +163,8 @@ const CustomerReport = (props) => {
                             </Form.Item>
                         </Col>
                         <Col span={4} >
-                            <Button type="primary" onClick={addreport} disabled={addreportStatus} >保存</Button>
-                            <Button style={{ marginLeft: 12, }} type="primary" 
-                                onClick={() => { 
-                                    Modal.confirm({
-                                        title: '客户信用报告',
-                                        content: '确定取消添加客户信用报告，如果确定，所有与本报告有关的信息都会删除！！！',
-                                        onOk() {
-                                            form.setFieldsValue({...form.getFieldsValue(), reportDate: null});  
-                                            setAddreportStatus(false) 
-                                        },
-                                        onCancel() {
-                                            
-                                        }
-                                    })
-                                    
-                                }}  
-                                disabled={props.modalType==='look'}
-                             >取消</Button>
+                            <Button type="primary" onClick={addreport} disabled={addreportStatus || props.modalType==='look'} >保存</Button>
+                            <Button style={{ marginLeft: 12, }} type="primary" onClick={() => { form.resetFields(); setAddreportStatus(false) }}  disabled={props.modalType==='look'} >取消</Button>
                         </Col>
                     </Row>
                     <h2 id='t0'>1.贷款记录</h2>
@@ -237,7 +219,7 @@ const CustomerReport = (props) => {
                         marginLeft: 8,
                     }}
                         type="primary"
-                        onClick={nextStep}
+                        htmlType="submit"
                     >
                         下一步 - 公司信用报告
                         </Button>
@@ -247,4 +229,4 @@ const CustomerReport = (props) => {
     );
 }
 
-export default CustomerReport;
+export default OtherReport;

@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { Table, Button, message } from 'antd'
+import { Table, Button, message, Modal } from 'antd'
 import request from '@/utils/request';
 import CustomerModal from './components/CustomerModal';
 import CompanyModal from './components/CompanyModal';
 import QiChaCha from './components/QiChaCha';
 import CompanyReport from './components/CompanyReport';
 import CustomerReport from './components/CustomerReport';
+import OtherReport from './components/OtherReport';
 
 // eslint-disable-next-line import/no-unresolved
 import AdvancedSearchForm from './components/AdvancedSearchForm';
@@ -18,7 +19,8 @@ export default class index extends Component {
 
 
   constructor(props) {
-    super(props)
+    super(props);
+
     this.state = {
       list: [],
       isLoading: false,
@@ -42,6 +44,7 @@ export default class index extends Component {
       companyTitle: '',
       customerReportTitle: '',
       companyReportTitle: '',
+      OtherReport:'',
       qiChaChaTitle: '',
       columns: [
         {
@@ -104,10 +107,16 @@ export default class index extends Component {
           title: '操作',
           key: 'action',
           render: (text) => (
+            
             <span>
-              <Button type='link' onClick={() => this.lookModalHandle(text)} style={{ marginRight: 16 }}>查看</Button>
-              <Button type='link' onClick={() => this.editModalHandle(text)} style={{ marginRight: 16 }}>编辑</Button>
-              <Button type='link' onClick={() => this.remove(text.id)}>删除</Button>
+              <Button  type='link' onClick={() => this.lookModalHandle(text)} style={{ marginRight: 16 }}>查看</Button>
+              <Button  type='link'
+               onClick={() => this.editModalHandle(text)} 
+               style={ text.staffId != localStorage.getItem("userId")?{ marginRight: 16, display: "none" }:{ marginRight: 16  }}>
+                 编辑</Button>
+              <Button  type='link' onClick={() => this.remove(text.id)}
+                style={ text.staffId != localStorage.getItem("userId")?{ marginRight: 16, display: "none" }:{ marginRight: 16  }}
+                >删除</Button>
             </span>
           ),
         },
@@ -123,29 +132,44 @@ export default class index extends Component {
 
   remove = (id) => {
     if(this.state.isSubmit){
+      const that = this;
       this.setState({
         isSubmit: false,
       })
-      request.get('/api/base/customer/remove', {
-        params: {
-          id,
-          userId: localStorage.getItem('userId'),
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      }).then(res => {
-        if (res.code === '0000') {
-          message.info('删除成功');
-          this.setState({
-            isSubmit: true,
-          },() => {
-            this.bindSerch(this.state.searchObj);
+      Modal.confirm({
+        title: '删除客户',
+        content: '确定删除客户',
+        onOk() {
+          request.get('/api/base/customer/remove', {
+            params: {
+              id,
+              userId: localStorage.getItem('userId'),
+            },
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          }).then(res => {
+            if (res.code === '0000') {
+              message.info('删除成功');
+              that.setState({
+                isSubmit: true,
+              },() => {
+                that.bindSerch(that.state.searchObj);
+              })
+            } else {
+              message.info('删除失败：' + res.data);
+            }
           })
-        } else {
-          message.info('删除失败');
+        },
+        onCancel() {
+          that.setState({
+            isSubmit: true,
+          }) 
         }
+    }) 
+      this.setState({
+        isSubmit: true,
       })
     }
     
@@ -216,6 +240,7 @@ export default class index extends Component {
     if (text == null) {
       return;
     }
+    
     this.setState({
       editObj: text,
       modalType: 'look',
@@ -233,6 +258,11 @@ export default class index extends Component {
   editModalHandle = (text) => {
     
     if (text == null) {
+      return;
+    }
+    console.log(90,text.staffId, localStorage.getItem("userId")) 
+    if(text.staffId != localStorage.getItem("userId")){
+      message.error("登录账号不是负责人，无法编辑");
       return;
     }
     this.setState({
@@ -258,6 +288,7 @@ export default class index extends Component {
       customerReportTitle: '添加-客户信用报告',
       companyReportTitle: '添加-企业信用报告',
       qiChaChaTitle: '添加-企查查报告'
+
     })
   }
 
@@ -294,7 +325,7 @@ export default class index extends Component {
         this.setState({
           customerVisible: false,
           companyVisible: true,
-          companyObj: {...res.data, legalPeople:customerName,customerName,idNum, mobilePhone, legalPeopleIdNum:idNum, customerId, }
+          companyObj: {...res.data, customerName,idNum, mobilePhone, customerId, }
         })
       }else{
         message.error(res.data? res.data : '获取公司信息失败，请联系系统运维人员');
@@ -310,7 +341,7 @@ export default class index extends Component {
         this.setState({
           customerVisible: false,
           companyVisible: true,
-          companyObj: { legalPeople:customerName, customerName,idNum, mobilePhone, legalPeopleIdNum:idNum, customerId },
+          companyObj: {  customerName,idNum, customerId },
         })
       }else if(this.state.modalType === 'edit'){
         this.getCompany(customerName, mobilePhone, idNum, customerId);
@@ -347,6 +378,7 @@ export default class index extends Component {
           companyVisible: false,
           customerReportVisible: true,
           customerReportObj:{...res.data, 
+            customerReportId: res.code.id,
             customerId,
             customerName:name, 
             companyName, 
@@ -415,6 +447,7 @@ export default class index extends Component {
           customerReportVisible: false,
           companyReportVisible: true,
           companyReportObj:{...res.data, 
+            companyReportId: res.code.id,
             customerId,
             customerName:name, 
             companyName, 
@@ -509,6 +542,7 @@ export default class index extends Component {
           setVisible={this.changeCustomer}
           editObj={this.state.editObj}
           modalType={this.state.modalType}
+          
         />
         <CompanyModal
           title= {this.state.companyTitle}  
@@ -531,13 +565,7 @@ export default class index extends Component {
           editObj={this.state.companyReportObj}
           modalType={this.state.modalType}
         />
-        <QiChaCha
-          title= {this.state.qiChaChaTitle} 
-          visible={this.state.qichachaVisible}
-          setVisible={this.changeQichacha}
-          editObj={this.state.qiChaChaObj}
-          modalType={this.state.modalType}
-        />
+
       </div>
     )
   }

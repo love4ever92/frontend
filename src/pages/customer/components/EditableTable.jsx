@@ -95,6 +95,9 @@ const EditableCell = ({
 };
 
 class EditableTable extends React.Component {
+
+    
+
     constructor(props) {
         super(props);
 
@@ -156,7 +159,7 @@ class EditableTable extends React.Component {
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/customer-loans/remove')}>
-                            <a>删除</a>
+                            <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                         </Popconfirm>
                     ) : null,
             },
@@ -214,7 +217,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/customer-overdue/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -278,7 +281,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/customer-guarantee/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -325,7 +328,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/loan-query/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -380,7 +383,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/customer-asset/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -438,7 +441,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/customer-debt/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -481,7 +484,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-share/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -548,7 +551,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-loans/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -603,7 +606,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-asset/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -658,7 +661,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-debt/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -714,7 +717,7 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-overdue/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
@@ -757,13 +760,98 @@ class EditableTable extends React.Component {
                     render: (text, record) =>
                         this.state.dataSource.length >= 1 ? (
                             <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-judicature-info/remove')}>
-                                <a>删除</a>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
+                            </Popconfirm>
+                        ) : null,
+                },
+            ]
+        }else if (this.props.type === 'companyTopManager') {
+            // 企业高管
+            this.columns = [
+                {
+                    title: '编号',
+                    dataIndex: 'key',
+                    key: 'key',
+                },
+                {
+                    title: '职务',
+                    dataIndex: 'job',
+                    key: 'job',
+                    editable: true,
+                },
+                {
+                    title: '姓名',
+                    dataIndex: 'name',
+                    key: 'name',
+                    editable: true,
+                },
+                {
+                    title: '身份证号码',
+                    dataIndex: 'idNum',
+                    key: 'idNum',
+                    editable: true,
+                },
+                {
+                    title: '备注',
+                    dataIndex: 'remark',
+                    key: 'remark',
+                    editable: true,
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    render: (text, record) =>
+                        this.state.dataSource.length >= 1 ? (
+                            <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-top-manager/remove')}>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
+                            </Popconfirm>
+                        ) : null,
+                },
+            ]
+        }else if (this.props.type === 'companyRelation') {
+            // 关联企业
+            this.columns = [
+                {
+                    title: '编号',
+                    dataIndex: 'key',
+                    key: 'key',
+                },
+                {
+                    title: '公司名称',
+                    dataIndex: 'name',
+                    key: 'name',
+                    editable: true,
+                },
+                {
+                    title: '中征码',
+                    dataIndex: 'companyCode',
+                    key: 'companyCode',
+                    editable: true,
+                },
+                {
+                    title: '关系',
+                    dataIndex: 'relation',
+                    key: 'relation',
+                    editable: true,
+                },
+                {
+                    title: '备注',
+                    dataIndex: 'remark',
+                    key: 'remark',
+                    editable: true,
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    render: (text, record) =>
+                        this.state.dataSource.length >= 1 ? (
+                            <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key, '/api/base/company-relation/remove')}>
+                                <a style={ this.props.modalType == 'look'? { display: "none"}:{}}>删除</a>
                             </Popconfirm>
                         ) : null,
                 },
             ]
         }
-        console.log('awq',this.props.modalType);
         if(this.props.modalType === 'add'){
             this.state = {
                 // eslint-disable-next-line react/no-unused-state
@@ -897,7 +985,7 @@ class EditableTable extends React.Component {
                     dataSource: list,
                 };
             } else if (this.props.type === 'companyLoans' && this.props.editObj.companyLoans){
-                const list = this.props.editObj.companyShares;
+                const list = this.props.editObj.companyLoans;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -966,6 +1054,40 @@ class EditableTable extends React.Component {
                 };
             }else if (this.props.type === 'companyJudicatureInfo' && this.props.editObj.companyJudicatureInfos){
                 const list = this.props.editObj.companyJudicatureInfos;
+                if(list.length > 0){
+                    list.map(v => {
+                        // eslint-disable-next-line no-param-reassign
+                        v.key = v.id
+                        return v
+                    });
+                }
+                this.state = {
+                    // eslint-disable-next-line react/no-unused-state
+                    isSubmit: false,
+                    count: list.lenth,
+                    // eslint-disable-next-line react/no-unused-state
+                    submitData: [],
+                    dataSource: list,
+                };
+            }else if (this.props.type === 'companyTopManager' && this.props.editObj.companyTopManagers){
+                const list = this.props.editObj.companyTopManagers;
+                if(list.length > 0){
+                    list.map(v => {
+                        // eslint-disable-next-line no-param-reassign
+                        v.key = v.id
+                        return v
+                    });
+                }
+                this.state = {
+                    // eslint-disable-next-line react/no-unused-state
+                    isSubmit: false,
+                    count: list.lenth,
+                    // eslint-disable-next-line react/no-unused-state
+                    submitData: [],
+                    dataSource: list,
+                };
+            }else if (this.props.type === 'companyRelation' && this.props.editObj.companyRelations){
+                const list = this.props.editObj.companyRelations;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1152,7 +1274,24 @@ class EditableTable extends React.Component {
                 isOver: "点击输入",
                 remark: "点击输入",
             };
+        }else if (this.props.type === 'companyTopManager'){
+            newData = {
+                key: count,
+                job: "点击输入",
+                name: "点击输入",
+                idNum: "点击输入",
+                remark: "点击输入",
+            };
+        }else if (this.props.type === 'companyRelation'){
+            newData = {
+                key: count,
+                name: "点击输入",
+                companyCode: "点击输入",
+                relation: "点击输入",
+                remark: "点击输入",
+            };
         }
+
 
         this.setState({
             dataSource: [...dataSource, newData],
@@ -1203,7 +1342,7 @@ class EditableTable extends React.Component {
                     message.error('放款单位不得为空');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].startTime.trim() === '点击输入' 
                     || this.state.submitData[i].startTime.trim() === ''){
                     message.error('开始时间不得为空');
@@ -1273,7 +1412,7 @@ class EditableTable extends React.Component {
                     message.error('被担保方不得为空');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].startTime.trim() === '点击输入' 
                     || this.state.submitData[i].startTime.trim() === ''){
                     message.error('开始时间不得为空');
@@ -1305,7 +1444,7 @@ class EditableTable extends React.Component {
                     message.error('查询机构不得为空');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].approvalDate.trim() === '点击输入' 
                     || this.state.submitData[i].approvalDate.trim() === ''){
                     message.error('查询日期不得为空');
@@ -1368,7 +1507,7 @@ class EditableTable extends React.Component {
                     message.error('债权方不得为空');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].startTime.trim() === '点击输入' 
                     || this.state.submitData[i].startTime.trim() === ''){
                     message.error('开始时间不得为空');
@@ -1389,7 +1528,7 @@ class EditableTable extends React.Component {
                 }
             }
             this.add('/api/base/customer-debt/add', '/api/base/customer-debt/list');
-        }else if (this.props.type === 'companyShare'){
+        } else if (this.props.type === 'companyShare'){
             if(!this.props.companyReportId){
                 message.error("未保存公司报告基本信息");
                 return;
@@ -1432,7 +1571,7 @@ class EditableTable extends React.Component {
                     message.error('发放金额(元)或当前逾期数(次)或当前逾金额(元)不为整数');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].startTime.trim() === '点击输入' 
                     || this.state.submitData[i].startTime.trim() === ''){
                     message.error('开始时间不得为空');
@@ -1454,7 +1593,7 @@ class EditableTable extends React.Component {
             }
 
             this.add('/api/base/company-loans/add', '/api/base/company-loans/list');
-        }else if (this.props.type === 'companyAsset'){
+        } else if (this.props.type === 'companyAsset'){
             if(!this.props.companyReportId){
                 message.error("未保存公司报告基本信息");
                 return;
@@ -1488,7 +1627,7 @@ class EditableTable extends React.Component {
                 }
             }
             this.add('/api/base/company-asset/add', '/api/base/company-asset/list');
-        }else if (this.props.type === 'companyDebt'){
+        } else if (this.props.type === 'companyDebt'){
 
             if(!this.props.companyReportId){
                 message.error("未保存公司报告基本信息");
@@ -1507,7 +1646,7 @@ class EditableTable extends React.Component {
                     message.error('债权方不得为空');
                     return;
                 }
-                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1])$/i);
+                const regexp = new RegExp(/^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(-)([0][1-9]|[1][0-2])(-)([0-2][1-9]|[3][0-1]|[1-2][0])$/i);
                 if(this.state.submitData[i].startTime.trim() === '点击输入' 
                     || this.state.submitData[i].startTime.trim() === ''){
                     message.error('开始时间不得为空');
@@ -1529,7 +1668,7 @@ class EditableTable extends React.Component {
             }
 
             this.add('/api/base/company-debt/add', '/api/base/company-debt/list');
-        }else if (this.props.type === 'companyOverdue'){
+        } else if (this.props.type === 'companyOverdue'){
             if(!this.props.companyReportId){
                 message.error("未保存公司报告基本信息");
                 return;
@@ -1557,7 +1696,7 @@ class EditableTable extends React.Component {
                 }
             }
             this.add('/api/base/company-overdue/add', '/api/base/company-overdue/list');
-        }else if (this.props.type === 'companyJudicatureInfo'){
+        } else if (this.props.type === 'companyJudicatureInfo'){
             if(!this.props.companyReportId){
                 message.error("未保存公司报告基本信息");
                 return;
@@ -1586,6 +1725,58 @@ class EditableTable extends React.Component {
                 }
             }
             this.add('/api/base/company-judicature-info/add', '/api/base/company-judicature-info/list');
+        }else if (this.props.type === 'companyTopManager'){
+            if(!this.props.companyReportId){
+                message.error("未保存公司报告基本信息");
+                return;
+            }
+            // eslint-disable-next-line no-plusplus
+            for (let i = 0; i < this.state.submitData.length; i++) {
+                if(this.state.submitData[i].job.trim() === '点击输入' 
+                    || this.state.submitData[i].job.trim() === ''){
+                    message.error('职务不得为空');
+                    return;
+                }
+
+                if(this.state.submitData[i].name.trim() === '点击输入' 
+                    || this.state.submitData[i].name.trim() === ''){
+                    message.error('姓名不得为空');
+                    return;
+                }
+                
+                if(this.state.submitData[i].idNum.trim() === '点击输入' 
+                    || this.state.submitData[i].idNum.trim() === ''){
+                    message.error('身份证号码不得为空');
+                    return;
+                }                
+            }
+            this.add('/api/base/company-top-manager/add', '/api/base/company-top-manager/list');
+        }else if (this.props.type === 'companyRelation'){
+            if(!this.props.companyReportId){
+                message.error("未保存公司报告基本信息");
+                return;
+            }
+            // eslint-disable-next-line no-plusplus
+            for (let i = 0; i < this.state.submitData.length; i++) {
+                if(this.state.submitData[i].name.trim() === '点击输入' 
+                    || this.state.submitData[i].name.trim() === ''){
+                    message.error('公司名称不得为空');
+                    return;
+                }
+
+                if(this.state.submitData[i].companyCode.trim() === '点击输入' 
+                    || this.state.submitData[i].companyCode.trim() === ''){
+                    message.error('中征码不得为空');
+                    return;
+                }
+                if(this.state.submitData[i].relation.trim() === '点击输入' 
+                    || this.state.submitData[i].relation.trim() === ''){
+                    message.error('关系不得为空');
+                    return;
+                }
+                
+            }
+            this.add('/api/base/company-relation/add', '/api/base/company-relation/list');
         }
     };
 

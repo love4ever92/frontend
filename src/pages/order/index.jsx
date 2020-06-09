@@ -17,7 +17,6 @@ export default class index extends Component {
     super(props)
     let columns = [];
     const auth = localStorage.getItem("antd-pro-authority");
-    if (auth === "管理员") {
       const list = [
         {
           title: '编号',
@@ -95,273 +94,58 @@ export default class index extends Component {
           render: (text, record) => (
             <span>
               <Button type='link' onClick={() => this.openLook(text, record)}>查看</Button>
-              <Button type='link' onClick={() => this.getFirsh(text, record)}>初始化</Button>
-              <Button type='link' onClick={() => this.openEdit(text, record)}>编辑</Button>
-              <Button type='link' onClick={() => this.getBack(text, record)}>撤回</Button>
-              <Button type='link' onClick={() => this.audit(text, record)}>审核</Button>
-              <Button type='link' onClick={() => this.remove(text, record)}>删除</Button>
+              <Button 
+               style={ auth === "管理员" ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+               type='link' onClick={() => this.getFirsh(text, record)}>
+                 初始化
+                 </Button>
+              <Button  type='link' 
+                onClick={() => this.openEdit(text, record)}
+                style={ text.createUser == localStorage.getItem("userId") ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+              >编辑</Button>
+              <Button 
+                style={ (text.createUser == localStorage.getItem("userId") &&  text.status == 2)
+                || (auth === "管理员" && text.status == 3)
+                || (auth === "财务"  && text.status == 5)
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link'
+                onClick={() => this.getBack(text, record)}
+              >撤回</Button>
+              <Button  
+                style={ (auth === "管理员" && text.status == 2  ) 
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link' onClick={() => this.audit(text, record)}>业务确认</Button>
+                <Button  
+                style={ (auth === "会计" && text.status == 3 
+                || localStorage.getItem("userName")==='admin' && text.status == 3  ) 
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link' onClick={() => this.finance(text, record)}>财务确认</Button>
+                <Button  
+                style={ (auth === "出纳" && text.status == 5 
+                || localStorage.getItem("userName")==='admin' && text.status == 5  ) 
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link' onClick={() => this.teller(text, record)}>出纳确认</Button>
+                <Button  
+                style={ (auth === "财务经理" && text.status == 6 
+                 || localStorage.getItem("userName")==='admin' && text.status == 6  ) 
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link' onClick={() => this.financeManager(text, record)}>财务经理确认</Button>
+                <Button  
+                
+                style={ (auth === "管理员" && text.status == 9 ) 
+                  && text.confirmCountersignStaffPlan === localStorage.getItem("userName")
+                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                type='link' onClick={() => this.countersign(text, record)}>会签</Button>
+              <Button  type='link'
+               onClick={() => this.remove(text, record)}
+               style={ text.createUser == localStorage.getItem("userId") ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+              >删除</Button>
             </span>
           ),
         },
       ];
       columns = list;
-    } else if (auth === "部门经理") {
-      const list = [
-        {
-          title: '编号',
-          dataIndex: 'key',
-          key: 'key',
-        },
-        {
-          title: '填表时间',
-          dataIndex: 'createTime',
-          key: 'createTime',
-        },
-        {
-          title: '部门',
-          dataIndex: 'departmentName',
-          key: 'departmentName',
-        },
-        {
-          title: '填表人',
-          dataIndex: 'createUserName',
-          key: 'createUserName',
-        },
-        {
-          title: '贷款企业',
-          dataIndex: 'companyName',
-          key: 'companyName',
-        },
-        {
-          title: '下款银行',
-          dataIndex: 'bankName',
-          key: 'bankName',
-        },
-        {
-          title: '下款金额',
-          dataIndex: 'loan',
-          key: 'loan',
-        },
-        {
-          title: '小款点位',
-          dataIndex: 'serviceRate',
-          key: 'serviceRate',
-        },
-        {
-          title: '小款是否已收(是/否)',
-          dataIndex: 'isGet',
-          key: 'isGet',
-        },
-        {
-          title: '其他渠道费用',
-          dataIndex: 'otherCost',
-          key: 'otherCost',
-        },
-        {
-          title: '业务确认结果',
-          dataIndex: 'confirmOpinion',
-          key: 'confirmOpinion',
-        },
-        {
-          title: '财务确认结果',
-          dataIndex: 'financeOpinion',
-          key: 'financeOpinion',
-        },
-        {
-          title: '操作时间',
-          dataIndex: 'operatTime',
-          key: 'operatTime',
-        },
-        {
-          title: '状态',
-          dataIndex: 'statusDesc',
-          key: 'statusDesc',
-        },
-        {
-          title: '操作',
-          key: 'action',
-          render: (text, record) => (
-            <span>
-              <Button type='link' onClick={() => this.openLook(text, record)}>查看</Button>
-              <Button type='link' onClick={() => this.openEdit(text, record)}>编辑</Button>
-              <Button type='link' onClick={() => this.getBack(text, record)}>撤回</Button>
-              <Button type='link' onClick={() => this.remove(text, record)}>删除</Button>
-            </span>
-          ),
-        },
-      ];
-      columns = list;
-    } else if (auth === "员工") {
-      const list = [
-        {
-          title: '编号',
-          dataIndex: 'key',
-          key: 'key',
-        },
-        {
-          title: '填表时间',
-          dataIndex: 'createTime',
-          key: 'createTime',
-        },
-        {
-          title: '部门',
-          dataIndex: 'departmentName',
-          key: 'departmentName',
-        },
-        {
-          title: '填表人',
-          dataIndex: 'createUserName',
-          key: 'createUserName',
-        },
-        {
-          title: '贷款企业',
-          dataIndex: 'companyName',
-          key: 'companyName',
-        },
-        {
-          title: '下款银行',
-          dataIndex: 'bankName',
-          key: 'bankName',
-        },
-        {
-          title: '下款金额',
-          dataIndex: 'loan',
-          key: 'loan',
-        },
-        {
-          title: '小款点位',
-          dataIndex: 'serviceRate',
-          key: 'serviceRate',
-        },
-        {
-          title: '小款是否已收(是/否)',
-          dataIndex: 'isGet',
-          key: 'isGet',
-        },
-        {
-          title: '其他渠道费用',
-          dataIndex: 'otherCost',
-          key: 'otherCost',
-        },
-        {
-          title: '业务确认结果',
-          dataIndex: 'confirmOpinion',
-          key: 'confirmOpinion',
-        },
-        {
-          title: '财务确认结果',
-          dataIndex: 'financeOpinion',
-          key: 'financeOpinion',
-        },
-        {
-          title: '操作时间',
-          dataIndex: 'operatTime',
-          key: 'operatTime',
-        },
-        {
-          title: '状态',
-          dataIndex: 'statusDesc',
-          key: 'statusDesc',
-        },
-        {
-          title: '操作',
-          key: 'action',
-          render: (text, record) => (
-            <span>
-              <Button type='link' onClick={() => this.openLook(text, record)}>查看</Button>
-              <Button type='link' onClick={() => this.openEdit(text, record)}>编辑</Button>
-              <Button type='link' onClick={() => this.getBack(text, record)}>撤回</Button>
-              <Button type='link' onClick={() => this.remove(text, record)}>删除</Button>
-            </span>
-          ),
-        },
-      ];
-      columns = list;
-    } else if (auth === '财务') {
-      const list = [
-        {
-          title: '编号',
-          dataIndex: 'key',
-          key: 'key',
-        },
-        {
-          title: '填表时间',
-          dataIndex: 'createTime',
-          key: 'createTime',
-        },
-        {
-          title: '部门',
-          dataIndex: 'departmentName',
-          key: 'departmentName',
-        },
-        {
-          title: '填表人',
-          dataIndex: 'createUserName',
-          key: 'createUserName',
-        },
-        {
-          title: '贷款企业',
-          dataIndex: 'companyName',
-          key: 'companyName',
-        },
-        {
-          title: '下款银行',
-          dataIndex: 'bankName',
-          key: 'bankName',
-        },
-        {
-          title: '下款金额',
-          dataIndex: 'loan',
-          key: 'loan',
-        },
-        {
-          title: '小款点位',
-          dataIndex: 'serviceRate',
-          key: 'serviceRate',
-        },
-        {
-          title: '小款是否已收(是/否)',
-          dataIndex: 'isGet',
-          key: 'isGet',
-        },
-        {
-          title: '其他渠道费用',
-          dataIndex: 'otherCost',
-          key: 'otherCost',
-        },
-        {
-          title: '业务确认结果',
-          dataIndex: 'confirmOpinion',
-          key: 'confirmOpinion',
-        },
-        {
-          title: '财务确认结果',
-          dataIndex: 'financeOpinion',
-          key: 'financeOpinion',
-        },
-        {
-          title: '操作时间',
-          dataIndex: 'operatTime',
-          key: 'operatTime',
-        },
-        {
-          title: '状态',
-          dataIndex: 'statusDesc',
-          key: 'statusDesc',
-        },
-        {
-          title: '操作',
-          key: 'action',
-          render: (text, record) => (
-            <span>
-              <Button type='link' onClick={() => this.openLook(text, record)}>查看</Button>
-              <Button type='link' onClick={() => this.audit(text, record)}>审核</Button>
-            </span>
-          ),
-        },
-      ];
-      columns = list;
-    }
+    
     this.state = {
       list: [],
       columns,
@@ -531,7 +315,7 @@ export default class index extends Component {
 
       } else {
         this.setState({
-          isSubmit: false
+          isSubmit: true
         })
         message.error(`查询列表失败，失败原因：${res.data}?${res.data}:请联系运维人员！`);
       }
@@ -539,6 +323,11 @@ export default class index extends Component {
   }
 
   openEdit = (text, record) => {
+
+    if(text.createUser != localStorage.getItem('userId')){
+      message.error('登录用户不是创建该订单的用户，无法编辑');
+      return;
+    }
     if (text.status == 3) {
       message.info("业务负责人审核通过,无法编辑");
     } else if (text.status == 5) {
@@ -611,7 +400,7 @@ export default class index extends Component {
         isSubmit: false,
       }, () => {
         if (localStorage.getItem("roleId") == 1) {
-          if (text.status != 6) {
+          if (text.status != 8) {
             this.getOrderBack(text.id);
           } else {
             message.info("订单流程已结束，无法撤回！！！")
@@ -637,10 +426,22 @@ export default class index extends Component {
             message.info("不是填表人，无法撤回！！！")
           }
         } else if (localStorage.getItem("roleId") == 4) {
+          if (text.status == 7) {
+            this.getOrderBack(text.id);
+          } else {
+            message.info("订单状态不是（财务经理已确认-待结算），财务经理无法撤回！！")
+          }
+        }else if (localStorage.getItem("roleId") == 5) {
           if (text.status == 5) {
             this.getOrderBack(text.id);
           } else {
-            message.info("订单状态不是财务已确认，无法撤回！！")
+            message.info("订单状态不是（财务已确认，待出纳确认），会计无法撤回！！")
+          }
+        }else if (localStorage.getItem("roleId") == 6) {
+          if (text.status == 6) {
+            this.getOrderBack(text.id);
+          } else {
+            message.info("订单状态不是（出纳已确认，待财务经理确认），出纳无法撤回！！")
           }
         }
         this.setState({
@@ -649,17 +450,38 @@ export default class index extends Component {
           console.log(this.state.isSubmit);
         })
       })
-    } else {
-      message.error("订单状态不是“待财务负责人确认”，不能审核")
-    }
+    } 
 
   }
 
+
+   /**
+   * 邀请会签
+   */
+  countersign = (text, record) => {
+    if (localStorage.getItem("roleId") == 1) {
+      if (text.status == 9) {
+        this.setState({
+          editObj: text
+        }, () => {
+          this.setState({
+            editObj: text,
+            auditVisible: true,
+            type: "countersign",
+          })
+        })
+      } else {
+        message.error("订单状态不是“业务会签中”，不能确认")
+      }
+    } else {
+      message.error("登录账号不是管理者，不能会签")
+    }
+  }
+
   /**
-   * 审核
+   * 业务确认
    */
   audit = (text, record) => {
-
     if (localStorage.getItem("roleId") == 1) {
       if (text.status == 2) {
         this.setState({
@@ -672,9 +494,18 @@ export default class index extends Component {
           })
         })
       } else {
-        message.error("订单状态不是“待业务负责人确认”，不能审核")
+        message.error("订单状态不是“待业务负责人确认”，不能确认")
       }
-    } else if (localStorage.getItem("roleId") == 4) {
+    } else {
+      message.error("登录账号不是管理者，不能确认")
+    }
+  }
+
+  /**
+   * 财务确认
+   */
+  finance = (text, record) => {
+    if (localStorage.getItem("roleId") == 5) {
       if (text.status == 3) {
         this.setState({
           editObj: text
@@ -686,10 +517,59 @@ export default class index extends Component {
           })
         })
       } else {
-        message.error("订单状态不是“待财务负责人确认”，不能审核")
+        message.error("订单状态不是“待财务确认”，不能确认")
       }
+    } else {
+      message.error("登录账号不是会计，不能确认")
     }
   }
+  
+  /**
+   * 出纳确认
+   */
+  teller = (text, record) => {
+    if (localStorage.getItem("roleId") == 6) {
+      if (text.status == 5) {
+        this.setState({
+          editObj: text
+        }, () => {
+          this.setState({
+            editObj: text,
+            auditVisible: true,
+            type: "teller",
+          })
+        })
+      } else {
+        message.error("订单状态不是“待出纳确认”，不能审核")
+      }
+    } else {
+      message.error("登录账号不是出纳，不能确认")
+    }
+  }
+  
+   /**
+   * 财务经理确认
+   */
+  financeManager = (text, record) => {
+    if (localStorage.getItem("roleId") == 4) {
+      if (text.status == 6) {
+        this.setState({
+          editObj: text
+        }, () => {
+          this.setState({
+            editObj: text,
+            auditVisible: true,
+            type: "financeManager",
+          })
+        })
+      } else {
+        message.error("订单状态不是“出纳已确认，待财务经理确认”，不能确认")
+      }
+    } else {
+      message.error("登录账号不是财务经理，不能确认")
+    }
+  }
+
 
   setAuditVisible = (visible) => {
     this.bindSerch(this.state.searchObj);
@@ -917,11 +797,11 @@ export default class index extends Component {
         <AdvancedSearchForm
           bindSerch={this.bindSerch}
           title="订单管理"
-          departmentOptions={this.state.departmentOptions}
-          staffOptions={this.state.staffOptions}
-          companyOptions={this.state.companyOptions}
-          bankOptions={this.state.bankOptions}
-          customerOptions={this.state.customerOptions}
+          departmentOptions={this.state.departmentOptions?this.state.departmentOptions:[]}
+          staffOptions={this.state.staffOptions?this.state.staffOptions:[]}
+          companyOptions={this.state.companyOptions?this.state.companyOptions:[]}
+          bankOptions={this.state.bankOptions?this.state.bankOptions:[]}
+          customerOptions={this.state.customerOptions?this.state.customerOptions:[]}
         />
         <Table dataSource={this.state.list} columns={this.state.columns} loading={this.state.isLoading}
           pagination={{
@@ -934,33 +814,33 @@ export default class index extends Component {
           visible={this.state.editVisible}
           setVisible={this.setEditVisible}
           editObj={this.state.editObj}
-          departmentOptions={this.state.departmentOptions}
-          staffOptions={this.state.staffOptions}
-          companyOptions={this.state.companyOptions}
-          bankOptions={this.state.bankOptions}
-          customerOptions={this.state.customerOptions}
+          departmentOptions={this.state.departmentOptions?this.state.departmentOptions:[]}
+          staffOptions={this.state.staffOptions?this.state.staffOptions:[]}
+          companyOptions={this.state.companyOptions?this.state.companyOptions:[]}
+          bankOptions={this.state.bankOptions?this.state.bankOptions:[]}
+          customerOptions={this.state.customerOptions?this.state.customerOptions:[]}
         />
         <LookModal
           title='查看订单详情'
           visible={this.state.lookVisible}
           setVisible={this.setLookVisible}
           editObj={this.state.editObj}
-          departmentOptions={this.state.departmentOptions}
-          staffOptions={this.state.staffOptions}
-          companyOptions={this.state.companyOptions}
-          bankOptions={this.state.bankOptions}
-          customerOptions={this.state.customerOptions}
+          departmentOptions={this.state.departmentOptions?this.state.departmentOptions:[]}
+          staffOptions={this.state.staffOptions?this.state.staffOptions:[]}
+          companyOptions={this.state.companyOptions?this.state.companyOptions:[]}
+          bankOptions={this.state.bankOptions?this.state.bankOptions:[]}
+          customerOptions={this.state.customerOptions?this.state.customerOptions:[]}
         />
         <AuditModal
           title='审核订单'
           visible={this.state.auditVisible}
           setVisible={this.setAuditVisible}
           editObj={this.state.editObj}
-          departmentOptions={this.state.departmentOptions}
-          staffOptions={this.state.staffOptions}
-          companyOptions={this.state.companyOptions}
-          bankOptions={this.state.bankOptions}
-          customerOptions={this.state.customerOptions}
+          departmentOptions={this.state.departmentOptions?this.state.departmentOptions:[]}
+          staffOptions={this.state.staffOptions?this.state.staffOptions:[]}
+          companyOptions={this.state.companyOptions?this.state.companyOptions:[]}
+          bankOptions={this.state.bankOptions?this.state.bankOptions:[]}
+          customerOptions={this.state.customerOptions?this.state.customerOptions:[]}
           type={this.state.type}
         />
 

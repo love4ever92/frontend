@@ -85,7 +85,7 @@ const AdvancedSearchForm = (props) => {
             name="isMarried"
             label="是否已婚"
           >
-            <SelectItem placeholder="请选择职位" url='/api/base/customer/isMarried' />
+            <SelectItem placeholder="请选择" url='/api/base/customer/isMarried' />
           </Form.Item>
       </Col>
       <Col span={10} >

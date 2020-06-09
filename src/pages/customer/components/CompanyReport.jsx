@@ -23,20 +23,26 @@ const CompanyReport = (props) => {
     }
 
     useEffect(() => {
-        console.log(12,props.editOb);
         form.setFieldsValue({ ...form.getFieldsValue(),
             name: props.editObj.customerName,
             companyName: props.editObj.companyName,
             reportDate:  props.editObj.reportDate?moment(props.editObj.reportDate, 'YYYY-MM-DD'):null,
         })
+        if(props.editObj.id){
+            setCompanyReportId(props.editObj.id);
+            setAddreportStatus(true);
+        }
+        if(props.editObj.modalType === 'look'){
+            setAddreportStatus(true)
+        }
     }, [props.editObj])
 
 
 
     const handleCancel = () => {
         Modal.confirm({
-            title: '添加客户信用资料',
-            content: '确定取消添加客户信用资料',
+            title: '客户信用报告',
+            content: '确定停止操作企业信用报告',
             onOk() {
                 props.setVisible();
                 form.resetFields();
@@ -147,7 +153,7 @@ const CompanyReport = (props) => {
                                 name="reportDate"
                                 label="报告日期："
                             >
-                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus||props.modalType==='look'}/>
+                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
                             </Form.Item>
                         </Col>
                         <Col span={3} >
@@ -167,8 +173,23 @@ const CompanyReport = (props) => {
                             </Form.Item>
                         </Col>
                         <Col span={4} >
-                            <Button type="primary" onClick={addreport} disabled={addreportStatus||props.modalType==='look'} >保存</Button>
-                            <Button style={{ marginLeft: 12, }} type="primary" onClick={() => { form.resetFields(); setAddreportStatus(false)  }}  disabled={props.modalType==='look'} >取消</Button>
+                            <Button type="primary" onClick={addreport} disabled={addreportStatus} >保存</Button>
+                            <Button style={{ marginLeft: 12, }} type="primary" 
+                                onClick={() => { 
+                                    Modal.confirm({
+                                        title: '企业信用报告',
+                                        content: '确定取消添加企业信用报告，如果确定，所有与本报告有关的信息都会删除！！！',
+                                        onOk() {
+                                            form.setFieldsValue({...form.getFieldsValue(), reportDate: null});  
+                                            setAddreportStatus(false) 
+                                        },
+                                        onCancel() {
+                                            
+                                        }
+                                    }) 
+                                }}  
+                                disabled={props.modalType==='look'} 
+                            >取消</Button>
                         </Col>
                     </Row>
                     <h2 id='t0'>1.主要出资人信息</h2>
@@ -180,7 +201,25 @@ const CompanyReport = (props) => {
                         editObj={props.editObj}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyShare"/>
-                    <h2 id='t1'>2.贷款情况</h2>
+                    <h2 id='t0'>2.企业高管信息</h2>
+                    <EditableTable 
+                        customerId={props.editObj.customerId}
+                        companyId = {props.editObj.companyId}
+                        companyReportId={companyReportId}
+                        modalType={props.modalType}
+                        editObj={props.editObj}
+                        // eslint-disable-next-line react/no-string-refs
+                        type="companyTopManager"/>
+                    <h2 id='t0'>3.直接关联企业</h2>
+                    <EditableTable 
+                        customerId={props.editObj.customerId}
+                        companyId = {props.editObj.companyId}
+                        companyReportId={companyReportId}
+                        modalType={props.modalType}
+                        editObj={props.editObj}
+                        // eslint-disable-next-line react/no-string-refs
+                        type="companyRelation"/>
+                    <h2 id='t1'>4.贷款情况</h2>
                     <EditableTable 
                         customerId={props.editObj.customerId}
                         companyId = {props.editObj.companyId}
@@ -189,7 +228,7 @@ const CompanyReport = (props) => {
                         editObj={props.editObj}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyLoans"/>
-                    <h2 id='t1'>3.企业资产</h2>
+                    <h2 id='t1'>5.企业资产</h2>
                     <EditableTable 
                         customerId={props.editObj.customerId}
                         companyId = {props.editObj.companyId}
@@ -198,7 +237,7 @@ const CompanyReport = (props) => {
                         editObj={props.editObj}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyAsset"/>
-                    <h2 id='t1'>4.企业负债</h2>
+                    <h2 id='t1'>6.企业负债</h2>
                     <EditableTable 
                         customerId={props.editObj.customerId}
                         companyId = {props.editObj.companyId}
@@ -207,7 +246,7 @@ const CompanyReport = (props) => {
                         editObj={props.editObj}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyDebt"/>
-                    <h2 id='t1'>5.企业逾期</h2>
+                    <h2 id='t1'>7.企业逾期</h2>
                     <EditableTable 
                         customerId={props.editObj.customerId}
                         companyId = {props.editObj.companyId}
@@ -216,7 +255,7 @@ const CompanyReport = (props) => {
                         editObj={props.editObj}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyOverdue"/>
-                    <h2 id='t1'>6.企查查（补充）</h2>
+                    <h2 id='t1'>8.企查查（补充）</h2>
                     <EditableTable 
                         customerId={props.editObj.customerId}
                         companyId = {props.editObj.companyId}

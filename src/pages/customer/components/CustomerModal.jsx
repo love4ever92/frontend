@@ -38,8 +38,8 @@ const CustomerModal = (props) => {
 
     const handleCancel = () => {
         Modal.confirm({
-            title: '添加客户',
-            content: '确定取消添加客户',
+            title: '客户信息',
+            content: '确定停止操作客户信息、企业信息、客户信用报告、企业信用报告',
             onOk() {
                 props.setVisible(false);
                 form.resetFields();
@@ -55,6 +55,10 @@ const CustomerModal = (props) => {
             let visitDate;
             // eslint-disable-next-line eqeqeq
             if(form.getFieldValue('isOrder') == 1){
+                if(!form.getFieldValue('visitDatePicker')){
+                    message.error('如果预约了面谈，预约面谈日期不能为空');
+                    return;
+                }
                 visitDate = form.getFieldValue('visitDatePicker').format('YYYY-MM-DD');
             }else{
                 visitDate = '';
@@ -107,6 +111,10 @@ const CustomerModal = (props) => {
             let visitDate;
             // eslint-disable-next-line eqeqeq
             if(form.getFieldValue('isOrder') == 1){
+                if(!form.getFieldValue('visitDatePicker')){
+                    message.error('如果预约了面谈，预约面谈日期不能为空');
+                    return;
+                }
                 visitDate = form.getFieldValue('visitDatePicker').format('YYYY-MM-DD');
             }else{
                 visitDate = '';
@@ -153,26 +161,42 @@ const CustomerModal = (props) => {
     
     const onFinish = () => {
         if(isSubmit){
-            setIsSubmit(false);
-            if(props.modalType === 'add'){
-                addData();
-            }else if(props.modalType === 'edit'){
-                Modal.confirm({
-                    title: '编辑客户',
-                    content: '确定修改客户信息',
-                    onOk() {
-                        editData();
-                    },                
-                })
-            }else if(props.modalType === 'look'){
-                props.setVisible(true,
-                    form.getFieldValue('customerName'),
-                    form.getFieldValue('mobilePhone'), 
-                    form.getFieldValue('idNum'),
-                    form.getFieldValue('id')
-                );
+            try{
+                setIsSubmit(false);
+                if(props.modalType === 'add'){
+                    Modal.confirm({
+                        title: '添加客户',
+                        content: '确定添加客户信息',
+                        onOk() {
+                            addData();
+                            setIsSubmit(true);
+                        },                
+                    })
+                }else if(props.modalType === 'edit'){
+                    Modal.confirm({
+                        title: '编辑客户',
+                        content: '确定修改客户信息',
+                        onOk() {
+                            editData();
+                            setIsSubmit(true);
+                        },                
+                    })
+
+                }else if(props.modalType === 'look'){
+                    props.setVisible(true,
+                        form.getFieldValue('customerName'),
+                        form.getFieldValue('mobilePhone'), 
+                        form.getFieldValue('idNum'),
+                        form.getFieldValue('id')
+                    );
+                    setIsSubmit(true);
+                }
+                setIsSubmit(true);
+            }catch(e){
+                console.error(e);
+                setIsSubmit(true);
             }
-            setIsSubmit(true);
+            
             
         }else{
             message.error("操作过于频繁，稍后再试")
@@ -187,6 +211,11 @@ const CustomerModal = (props) => {
     const educationHandleChange = value => {
         form.setFieldsValue({ education: value });
     }
+    const rankHandleChange = value => {
+        form.setFieldsValue({ rank: value });
+    }
+
+    
     // 选择婚姻状况处理
     const isMarriedHandleChange = value => {
 
@@ -373,13 +402,15 @@ const CustomerModal = (props) => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: '请选择客户性别',
+                                        message: '请选择',
                                     },
                                 ]}
                             >
                                 <Select defaultValue="0" onChange={genderHandleChange}
                                     // eslint-disable-next-line react/jsx-no-duplicate-props
-                                    defaultValue={form.getFieldValue('gender')} disabled={props.modalType==='edit' || props.modalType==='look'}>
+                                    defaultValue={form.getFieldValue('gender')} 
+                                    placeholder="请选择"
+                                    disabled={props.modalType==='edit' || props.modalType==='look'}>
                                     <Select.Option value="0" disabled>请选择</Select.Option>
                                     <Select.Option value={1}>男</Select.Option>
                                     <Select.Option value={2}>女</Select.Option>
@@ -388,10 +419,10 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={10}>
+                        <Col span={8}>
                             <Form.Item
                                 name="idNum"
-                                label="身份证号码"
+                                label="身份证"
                                 rules={[
                                     {
                                         required: true,
@@ -425,36 +456,62 @@ const CustomerModal = (props) => {
                                 />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={5}>
                             <Form.Item
                                 name="education"
                                 label="学历"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择学历',
-                                    },
-                                ]}
                             >
-                                <Select defaultValue="0" disabled ={props.modalType==='look'} onChange={educationHandleChange}
+                                <Select defaultValue="0" disabled ={props.modalType==='look'} 
+                                    onChange={educationHandleChange}
+                                    placeholder="请选择"
                                     // eslint-disable-next-line react/jsx-no-duplicate-props
                                     defaultValue={form.getFieldValue('education')}>
                                     <Select.Option value={0} disabled>请选择</Select.Option>
                                     <Select.Option value={1}>小学</Select.Option>
                                     <Select.Option value={2}>初中</Select.Option>
-                                    <Select.Option value={3}>高中</Select.Option>
-                                    <Select.Option value={4}>大学专科</Select.Option>
-                                    <Select.Option value={5}>大学本科</Select.Option>
+                                    <Select.Option value={3}>高中/中专</Select.Option>
+                                    <Select.Option value={4}>大专</Select.Option>
+                                    <Select.Option value={5}>本科</Select.Option>
                                     <Select.Option value={6}>研究生</Select.Option>
                                     <Select.Option value={7}>硕士</Select.Option>
                                     <Select.Option value={8}>博士</Select.Option>
                                 </Select>
                             </Form.Item>
                         </Col>
-
+                        <Col span={5}>
+                            <Form.Item
+                                name="rank"
+                                label="身份"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请选择客户身份，法人或股东',
+                                    },
+                                ]}
+                            >
+                                <Select disabled ={props.modalType==='look'} 
+                                    onChange={rankHandleChange}
+                                    placeholder="请选择"
+                                    // eslint-disable-next-line react/jsx-no-duplicate-props
+                                    defaultValue={form.getFieldValue('education')}>
+                                    <Select.Option value="法人">法人</Select.Option>
+                                    <Select.Option value="股东">股东</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={12}>
+                        
+                        <Col span={6}>
+                            <Form.Item
+                                name="rate"
+                                label="持股比例(%)"
+                            >
+                                <Input placeholder="持股比例" 
+                                    disabled ={props.modalType==='look'}/>
+                            </Form.Item>
+                        </Col>
+                        <Col span={9}>
                             <Form.Item
                                 name="bankName"
                                 label="银行名称"
@@ -462,7 +519,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="请输入银行名称" disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col span={9}>
                             <Form.Item
                                 name="bankCardNum"
                                 label="银行卡号码"
@@ -485,7 +542,9 @@ const CustomerModal = (props) => {
                             >
                                 <Select defaultValue="0" onChange={isMarriedHandleChange}
                                     // eslint-disable-next-line react/jsx-no-duplicate-props
-                                    defaultValue={form.getFieldValue('isMarried')} disabled ={props.modalType==='look'}>
+                                    defaultValue={form.getFieldValue('isMarried')} 
+                                    placeholder="请选择"
+                                    disabled ={props.modalType==='look'}>
                                     <Select.Option value={0} disabled>请选择</Select.Option>
                                     <Select.Option value={1}>未婚</Select.Option>
                                     <Select.Option value={2}>已婚</Select.Option>
@@ -560,12 +619,7 @@ const CustomerModal = (props) => {
                             <Form.Item
                                 name="msgProvince"
                                 label=""
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择',
-                                    },
-                                ]}
+                                
                             >
                                 <Select
                                     showSearch
@@ -590,12 +644,7 @@ const CustomerModal = (props) => {
                             <Form.Item
                                 name="msgCity"
                                 label=""
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择',
-                                    },
-                                ]}
+                                
                             >
                                 <Select
                                     showSearch
@@ -620,12 +669,6 @@ const CustomerModal = (props) => {
                             <Form.Item
                                 name="msgArea"
                                 label=""
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择',
-                                    },
-                                ]}
                             >
                                 <Select
                                     showSearch
@@ -649,12 +692,7 @@ const CustomerModal = (props) => {
                             <Form.Item
                                 name="msgAddress"
                                 label=""
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入详细地址',
-                                    },
-                                ]}
+                                
                             >
                                 <Input placeholder="请输入详细地址" disabled ={props.modalType==='look'}/>
                             </Form.Item>
@@ -772,11 +810,11 @@ const CustomerModal = (props) => {
                         <Col span={8}>
                             <Form.Item
                                 name="visitDatePicker"
-                                label="下次拜访日期"
+                                label="预约面谈日期"
                                 rules={[
                                     {
                                         required: false,
-                                        message: '请选择拜访日期',
+                                        message: '请选择预约日期',
                                     },
                                 ]}
                             >

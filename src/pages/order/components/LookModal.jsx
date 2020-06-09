@@ -476,12 +476,42 @@ const LookModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                    <Col span={24}>
+                        <Col span={8} >
+                            <Form.Item
+                                name="needInvoice"
+                                label="是否开票"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请选择',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled
+                                >
+                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
+                                    <Select.Option key={1} value="是">是</Select.Option>
+                                    <Select.Option key={2} value="否">否</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={16}>
                             <Form.Item
                                 name="remark"
                                 label="备注"
                             >
-                                <Input  disabled/>
+                                <Input placeholder="备注" disabled/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -496,8 +526,63 @@ const LookModal = (props) => {
                             </Form.Item>
                         </Col>
                     </Row>
+                    <Row gutter={24}  >
+                        <Col span={6}>
+                            <Form.Item
+                                name="confirmCountersignStaff"
+                                label="业务会签"
+                                rules={[
+                                    {
+                                        required: props.type==="countersign",
+                                        message: '业务会签签名',
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="签名"  disabled={ props.type!=="countersign" } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="confirmCountersignOpinion"
+                                label="会签结果"
+                                rules={[
+                                    {
+                                        required: props.type==="countersign",
+                                        message: '请选择',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={ props.type!=="countersign" }
+                                >
+                                    <Select.Option disabled key={0} value="0">请选择</Select.Option>
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12} >
+                            <Form.Item
+                                name="confirmCountersignReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见" 
+                                    disabled={ props.type!=="countersign" } />
+                            </Form.Item>
+                        </Col>
+                    </Row>
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="confirmStaff"
                                 label="业务负责人"
@@ -505,7 +590,7 @@ const LookModal = (props) => {
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="confirmOpinion"
                                 label="确认结果"
@@ -529,9 +614,7 @@ const LookModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={24}>
-                    <Col span={24}>
+                        <Col span={12}>
                             <Form.Item
                                 name="confirmReason"
                                 label="处理意见"
@@ -541,15 +624,15 @@ const LookModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="financeStaff"
-                                label="财务负责人"
+                                label="会计确认"
                             >
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Form.Item
                                 name="financeOpinion"
                                 label="确认结果"
@@ -573,9 +656,7 @@ const LookModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={24}>
-                    <Col span={24}>
+                        <Col span={12}>
                             <Form.Item
                                 name="financeReason"
                                 label="处理意见"
@@ -584,6 +665,116 @@ const LookModal = (props) => {
                             </Form.Item>
                         </Col>
                     </Row>
+                    <Row gutter={24} >
+                        <Col span={6}>
+                            <Form.Item
+                                name="tellerStaff"
+                                label="出纳确认"
+                                rules={[
+                                    {
+                                        required: props.type==="teller",
+                                        message: '出纳确认签名',
+                                    },
+                                ]}
+                            >
+                                <Input  placeholder="签名" disabled={ props.type!=="teller"  } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="tellerOpinion"
+                                label="确认结果"
+                                rules={[
+                                    {
+                                        required: props.type==="teller",
+                                        message: '请选择',
+                                    },
+                                ]}
+                                
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={props.type!=="teller" }
+                                >
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="tellerReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见"  disabled={props.type !== "teller" }/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={24}>
+                        <Col span={6}>
+                            <Form.Item
+                                name="financeManagerStaff"
+                                label="财务经理确认"
+                                rules={[
+                                    {
+                                        required: props.type==="financeManager",
+                                        message: '财务经理签名',
+                                    },
+                                ]}
+                            >
+                                <Input  placeholder="签名" disabled={ props.type!=="financeManager" } />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item
+                                name="financeManagerOpinion"
+                                label="确认结果"
+                                rules={[
+                                    {
+                                        required: props.type==="financeManager",
+                                        message: '请选择',
+                                    },
+                                ]}
+                                
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="请选择"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled={props.type!=="financeManager" }
+                                >
+                                    
+                                    <Select.Option key={1} value="同意">同意</Select.Option>
+                                    <Select.Option key={2} value="不同意">不同意</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="financeManagerReason"
+                                label="处理意见"
+                            >
+                                <Input placeholder="处理意见"  disabled={props.type !== "financeManager" }/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
                 </Form>
             </Modal>
         </div>

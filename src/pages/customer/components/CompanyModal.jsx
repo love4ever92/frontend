@@ -18,6 +18,7 @@ const CompanyModal = (props) => {
     const [ loaded, setLoaded] = useState(false);
     const [ imgVisible, setImgVisible] = useState(false);
     const [ isSubmit, setIsSubmit ] = useState(true);
+    const [ isLongTime, setIsLongTime ] = useState(true);
 
 
 
@@ -84,13 +85,13 @@ const CompanyModal = (props) => {
                 message.error('您只能上传JPG/PNG 文件!');
                 return;
             }
-            const isLt2M = file.size / 1024 / 1024 < 10;
-            if (!isLt2M) {
-                message.error('图片大小必须小于10MB!');
+            const isLt3M = file.size / 1024 / 1024 < 3;
+            if (!isLt3M) {
+                message.error('图片大小必须小于3MB!');
                 return;
             }
             // eslint-disable-next-line consistent-return
-            return isJpgOrPng && isLt2M;
+            return isJpgOrPng && isLt3M;
         },
     }
 
@@ -99,8 +100,6 @@ const CompanyModal = (props) => {
         form.setFieldsValue({ ...props.editObj, 
             setTime: props.editObj.setTime?moment(props.editObj.setTime, 'YYYY-MM-DD'):null,
             endTime: props.editObj.endTime?moment(props.editObj.endTime, 'YYYY-MM-DD'):null,
-            legalPeopleIdNum: props.editObj.legalPeopleIdNum,
-            legalPeople: props.editObj.legalPeople
     });
     }, [props.editObj])
 
@@ -116,8 +115,8 @@ const CompanyModal = (props) => {
 
     const handleCancel = () => {
         Modal.confirm({
-            title: '添加客户',
-            content: '确定取消添加客户',
+            title: '企业信息',
+            content: '确定停止操作企业信息、客户信用报告、企业信用报告',
             onOk() {
                 props.setVisible();
                 form.resetFields();
@@ -129,8 +128,13 @@ const CompanyModal = (props) => {
     }
 
     const addData = () => {
-        if(!form.getFieldValue('setTime') || !form.getFieldValue('endTime')){
-            message.error('未选择正确的成立时间或经营期限')
+        if(!form.getFieldValue('setTime')){
+            message.error('未选择正确的成立时间')
+            return;
+        }
+        console.log(11111,form.getFieldValue('timeType'))
+        if(form.getFieldValue('timeType')===1 && !form.getFieldValue('endTime')){
+            message.error('期限类型为固定期限，需要选择营业期限')
             return;
         }
         request.post("/api/base/company/add", {
@@ -138,7 +142,7 @@ const CompanyModal = (props) => {
                 ...form.getFieldsValue(),
                 userId: localStorage.getItem('userId'),
                 setTime: form.getFieldValue('setTime').format('YYYY-MM-DD'),
-                endTime: form.getFieldValue('endTime').format('YYYY-MM-DD'),
+                endTime: form.getFieldValue('endTime')?form.getFieldValue('endTime').format('YYYY-MM-DD'):"",
                 customerId: props.editObj.customerId,
             },
             headers: {
@@ -174,8 +178,13 @@ const CompanyModal = (props) => {
 
 
     const editData = () =>{
-        if(!form.getFieldValue('setTime') || !form.getFieldValue('endTime')){
-            message.error('未选择正确的成立时间或经营期限')
+        if(!form.getFieldValue('setTime')){
+            message.error('未选择正确的成立时间')
+            return;
+        }
+        console.log(11111,form.getFieldValue('timeType'))
+        if(form.getFieldValue('timeType')===1 && !form.getFieldValue('endTime')){
+            message.error('当期限类型为固定期限时，需要选择营业期限')
             return;
         }
         request.post("/api/base/company/update", {
@@ -183,7 +192,7 @@ const CompanyModal = (props) => {
                 ...form.getFieldsValue(),
                 userId: localStorage.getItem('userId'),
                 setTime: form.getFieldValue('setTime').format('YYYY-MM-DD'),
-                endTime: form.getFieldValue('endTime').format('YYYY-MM-DD'),
+                endTime: form.getFieldValue('endTime')?form.getFieldValue('endTime').format('YYYY-MM-DD'):"",
                 customerId: props.editObj.customerId,
             },
             headers: {
@@ -221,18 +230,38 @@ const CompanyModal = (props) => {
 
     const onFinish = () => {
         if(isSubmit){
-            setIsSubmit(false);
-            if(props.modalType === 'add'){
-                addData();
-            }else if(props.modalType === 'edit'){
-                editData();
-            }else if(props.modalType === 'look'){
-                props.setVisible(true,props.editObj.customerId, 
-                    props.editObj.customerName, 
-                    form.getFieldValue('name'),
-                    form.getFieldValue('id'));
+            try{
+                setIsSubmit(false);
+                if(props.modalType === 'add'){
+                    Modal.confirm({
+                        title: '添加公司',
+                        content: '确定添加公司信息',
+                        onOk() {
+                            addData();
+                            setIsSubmit(true);
+                        },                
+                    })
+                }else if(props.modalType === 'edit'){
+                    Modal.confirm({
+                        title: '修改公司',
+                        content: '确定修改公司信息',
+                        onOk() {
+                            editData();
+                            setIsSubmit(true);
+                        },                
+                    })
+                }else if(props.modalType === 'look'){
+                    props.setVisible(true,props.editObj.customerId, 
+                        props.editObj.customerName, 
+                        form.getFieldValue('name'),
+                        form.getFieldValue('id'));
+                }
+                setIsSubmit(true);
+            }catch(e){
+                console.error(e);
+                setIsSubmit(true);
             }
-            setIsSubmit(true);
+            
         }else{
             message.error(`操作过于频繁，请稍后再试`);
         }
@@ -255,8 +284,16 @@ const CompanyModal = (props) => {
     const taxLevelHandleChange = value => {
         form.setFieldsValue({ taxLevel: value });
     }
+    
+    const timeTypeoOnChange = value => {
+        form.setFieldsValue({ timeType : value });
 
-
+        if (value == 1) {
+            setIsLongTime(false);
+        } else {
+            setIsLongTime(true);
+        }
+    }
     /**
     * 下拉框获取城市
     */
@@ -365,7 +402,7 @@ const CompanyModal = (props) => {
                     onFinish={onFinish}
                 >
                     <Row gutter={24}>
-                        <Col span={6} >
+                        <Col span={5} >
                             <Form.Item
                                 name="id"
                                 label="公司编号"
@@ -385,10 +422,10 @@ const CompanyModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="请输入公司名称" disabled ={props.modalType==='look'}/>
+                                <Input placeholder="请输入公司名称" disabled ={props.modalType==='look' || (props.modalType === 'edit' && form.getFieldValue('name')) }/>
                             </Form.Item>
                         </Col>
-                        <Col span={9} >
+                        <Col span={10} >
                             <Form.Item
                                 name="companyCode"
                                 label="统一信用编码"
@@ -399,7 +436,7 @@ const CompanyModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="请输入公司统一信用编码" disabled ={props.modalType==='look'}/>
+                                <Input placeholder="请输入公司统一信用编码" disabled ={props.modalType==='look' || (props.modalType === 'edit' && form.getFieldValue('name'))}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -517,7 +554,7 @@ const CompanyModal = (props) => {
                                     disabled ={props.modalType==='look'}
                                 >
                                     <Select.Option disabled key='0' value='0'>省</Select.Option>
-                                    {companyProvinceOptions.map(v => {
+                                    {!companyProvinceOptions?"":companyProvinceOptions.map(v => {
                                         return (<Select.Option key={v.code} value={v.code ? `${v.code}:${v.name}` : v.id}>{v.name}</Select.Option>);
                                     })}
                                 </Select>
@@ -540,7 +577,7 @@ const CompanyModal = (props) => {
                                     disabled ={props.modalType==='look'}
                                 >
                                     <Select.Option disabled key='0' value='0'>市</Select.Option>
-                                    {companyCityOptions.map(v => {
+                                    {!companyCityOptions?"":companyCityOptions.map(v => {
                                         return (<Select.Option key={v.code} value={v.code ? `${v.code}:${v.name}` : v.id}>{v.name}</Select.Option>);
                                     })}
                                 </Select>
@@ -562,7 +599,7 @@ const CompanyModal = (props) => {
                                     disabled ={props.modalType==='look'}
                                 >
                                     <Select.Option disabled key='0' value='0'>区</Select.Option>
-                                    {companyAreaOptions.map(v => {
+                                    {!companyAreaOptions?"":companyAreaOptions.map(v => {
                                         return (<Select.Option key={v.code} value={v.code ? `${v.name}` : v.id}>{v.name}</Select.Option>);
                                     })}
                                 </Select>
@@ -573,7 +610,7 @@ const CompanyModal = (props) => {
                                 name="address"
                                 label=""
                             >
-                                <Input placeholder="请输入详细地址" />
+                                <Input placeholder="请输入详细地址" disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -582,12 +619,6 @@ const CompanyModal = (props) => {
                             <Form.Item
                                 name="invoiceMoney"
                                 label="年开票金额"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '年开票金额',
-                                    },
-                                ]}
                             >
                                 <Select defaultValue="0" onChange={invoiceMoneyHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
@@ -603,12 +634,6 @@ const CompanyModal = (props) => {
                             <Form.Item
                                 name="payTaxes"
                                 label="年纳税金额"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '年纳税金额',
-                                    },
-                                ]}
                             >
                                 <Select defaultValue="0" onChange={payTaxesHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
@@ -624,12 +649,6 @@ const CompanyModal = (props) => {
                             <Form.Item
                                 name="taxLevel"
                                 label="纳税评级"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '纳税评级',
-                                    },
-                                ]}
                             >
                                 <Select defaultValue="0" onChange={taxLevelHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
@@ -672,33 +691,31 @@ const CompanyModal = (props) => {
                         </Col>
                         <Col span={8}>
                             <Form.Item
-                                name="endTime"
-                                label="营业期限"
+                                name="timeType"
+                                label="期限类型"
                                 rules={[
                                     {
                                         required: true,
-                                        message: '请选择营业期限',
+                                        message: '请选择期限类型',
                                     },
                                 ]}
                             >
-                                <DatePicker
-                                    disabled ={props.modalType==='look'}
-                                    format='YYYY-MM-DD'
-                                />
+                                <Select defaultValue="0" onChange={timeTypeoOnChange} disabled ={props.modalType==='look'}>
+                                    <Select.Option key="0" value="0" disabled >请选择</Select.Option>
+                                    <Select.Option key="1" value={1}>固定期限</Select.Option>
+                                    <Select.Option key="2" value={2}>长期</Select.Option>
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col span={8}>
                             <Form.Item
-                                name="organizationType"
-                                label="组成形式"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择组成形式',
-                                    },
-                                ]}
+                                name="endTime"
+                                label="营业期限"
                             >
-                                <Input placeholder="组成形式"  disabled ={props.modalType==='look'}/>
+                                <DatePicker
+                                    disabled = {props.modalType==='look' || isLongTime }
+                                    format='YYYY-MM-DD'
+                                />
                             </Form.Item>
                         </Col>
                     </Row>
