@@ -54,7 +54,6 @@ const AdvancedSearchForm = (props) => {
 
   return (
     <>
-
       <h1>{props.title}</h1>
       <div>
         <Form

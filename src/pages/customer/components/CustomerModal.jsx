@@ -33,6 +33,9 @@ const CustomerModal = (props) => {
         if (props.visible) {
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             getProvince();
+            if(props.modalType == "add"){
+                form.resetFields();
+            }
         }
     }, [props.visible])
 
@@ -79,7 +82,7 @@ const CustomerModal = (props) => {
                 if (res.code === '0000') {
                     Modal.confirm({
                         title: '添加客户',
-                        content: '添加客户成功,如继续添加企业信息请点击确定',
+                        content: '添加客户成功,如继续添加企业信息请到企业管理添加',
                         onOk() {
                             
                             props.setVisible(true,
@@ -134,7 +137,7 @@ const CustomerModal = (props) => {
                 if (res.code === '0000') {
                     Modal.confirm({
                         title: '编辑客户',
-                        content: '客户修改信息成功,如继续修改企业信息请点击确定',
+                        content: '客户修改信息成功,如需修改企业信息，请到管理操作',
                         onOk() {
                             props.setVisible(true,
                                 form.getFieldValue('customerName'),
@@ -142,7 +145,7 @@ const CustomerModal = (props) => {
                                 form.getFieldValue('idNum'),
                                 form.getFieldValue('id')
                             );
-                            form.resetFields();
+                            // form.resetFields();
                         },
                     })
                 } else {
@@ -308,21 +311,41 @@ const CustomerModal = (props) => {
         })
     }
     const msgProvinceHandleChange = (value, key) => {
+        setMsgCityOptions([]);
+        setMsgAreaOptions([]);
+        form.setFieldsValue({...form.getFieldsValue(),
+            "msgCity" : "0",
+            "msgArea" : "0",
+        });
         getCity(value, key).then(res => {
             setMsgCityOptions(res);
         });
     }
     const idProvinceHandleChange = value => {
+        setIdCityOptions([]);
+        setIdAreaOptions([]);
+        form.setFieldsValue({...form.getFieldsValue(),
+            "idCity" : "0",
+            "idArea" : "0",
+        });
         getCity(value).then(res => {
             setIdCityOptions(res);
         });
     }
     const msgCityHandleChange = value => {
+        setMsgAreaOptions([]);
+        form.setFieldsValue({...form.getFieldsValue(),
+            "msgArea" : "0",
+        });
         getArea(value).then(res => {
             setMsgAreaOptions(res);
         });
     }
     const idCityHandleChange = value => {
+        setIdAreaOptions([]);
+        form.setFieldsValue({...form.getFieldsValue(),
+            "idArea" : "0",
+        });
         getArea(value).then(res => {
             setIdAreaOptions(res);
         });
@@ -439,7 +462,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="请输入客户身份证号码" disabled={props.modalType==='edit' || props.modalType==='look'} />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col span={8}>
                             <Form.Item
                                 name="birthdayPicker"
                                 label="生日"
@@ -456,7 +479,7 @@ const CustomerModal = (props) => {
                                 />
                             </Form.Item>
                         </Col>
-                        <Col span={5}>
+                        <Col span={8}>
                             <Form.Item
                                 name="education"
                                 label="学历"
@@ -478,40 +501,9 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={5}>
-                            <Form.Item
-                                name="rank"
-                                label="身份"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择客户身份，法人或股东',
-                                    },
-                                ]}
-                            >
-                                <Select disabled ={props.modalType==='look'} 
-                                    onChange={rankHandleChange}
-                                    placeholder="请选择"
-                                    // eslint-disable-next-line react/jsx-no-duplicate-props
-                                    defaultValue={form.getFieldValue('education')}>
-                                    <Select.Option value="法人">法人</Select.Option>
-                                    <Select.Option value="股东">股东</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        </Col>
                     </Row>
                     <Row gutter={24}>
-                        
-                        <Col span={6}>
-                            <Form.Item
-                                name="rate"
-                                label="持股比例(%)"
-                            >
-                                <Input placeholder="持股比例" 
-                                    disabled ={props.modalType==='look'}/>
-                            </Form.Item>
-                        </Col>
-                        <Col span={9}>
+                        <Col span={12}>
                             <Form.Item
                                 name="bankName"
                                 label="银行名称"
@@ -519,7 +511,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="请输入银行名称" disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
-                        <Col span={9}>
+                        <Col span={12}>
                             <Form.Item
                                 name="bankCardNum"
                                 label="银行卡号码"
@@ -558,7 +550,7 @@ const CustomerModal = (props) => {
                                 label="配偶姓名"
                             >
                                 <Input
-                                    placeholder="请输入配偶姓名"
+                                    placeholder={props.modalType != "look"  ? "请输入配偶姓名":""}
                                     disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
@@ -576,7 +568,7 @@ const CustomerModal = (props) => {
                                 ]}
                             >
                                 <Input
-                                    placeholder="请输入配偶身份证号码"
+                                    placeholder={props.modalType!="look"?"请输入配偶身份证号码":""}
                                     disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
@@ -596,7 +588,8 @@ const CustomerModal = (props) => {
                                     }
                                 ]}
                             >
-                                <Input placeholder="请输入客户配偶的手机号码" disabled={!mateInfoVisible} />
+                                <Input  placeholder={props.modalType!="look"?"请输入客户配偶的手机号码":""}
+                                disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
@@ -604,7 +597,7 @@ const CustomerModal = (props) => {
                                 name="mateCompany"
                                 label="配偶工作单位"
                             >
-                                <Input placeholder="请输入配偶工作单位" disabled={!mateInfoVisible} />
+                                <Input  placeholder={props.modalType!="look"?"请输入配偶工作单位":""} disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -694,7 +687,7 @@ const CustomerModal = (props) => {
                                 label=""
                                 
                             >
-                                <Input placeholder="请输入详细地址" disabled ={props.modalType==='look'}/>
+                                <Input placeholder = {props.modalType=="look"?"":"请输入详细地址"}  disabled = {props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -781,7 +774,7 @@ const CustomerModal = (props) => {
                                 name="idAddress"
                                 label=""
                             >
-                                <Input placeholder="请输入详细地址" disabled ={props.modalType==='look'}/>
+                                <Input placeholder = {props.modalType=="look"?"":"请输入详细地址"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -846,8 +839,8 @@ const CustomerModal = (props) => {
                     }}
                         type="primary"
                         htmlType="submit"
-                    >
-                        下一步 - 公司信息
+                    >                        
+                        {props.modalType=="look"?"下一步 - 查看公司信息":"提交"}
                         </Button>
                     <Button
                         style={{

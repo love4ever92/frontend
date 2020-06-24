@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react'
-import { Modal, Button, Form, Input, Row, Col,  DatePicker,message } from 'antd'
+import { Modal, Button, Form, Input, Row, Col,  DatePicker,message,Select  } from 'antd'
 import request from '@/utils/request';
 import moment from 'moment';
 import EditableTable from './EditableTable';
@@ -13,6 +13,16 @@ const CompanyReport = (props) => {
     const [addreportStatus, setAddreportStatus] = useState(false);
     const [companyReportId,setCompanyReportId] = useState(0);
     const [ isSubmit, setIsSubmit ] = useState(true);
+    const [ reportDateList, setReportDateList ] = useState([]);
+    const [ companyList, setCompanyList  ] = useState([]);
+    const [ companyAssets, setCompanyAssets] = useState({});
+    const [ companyDebts, setCompanyDebts] = useState({});
+    const [ companyShares, setCompanyShares] = useState({});
+    const [ companyLoans, setCompanyLoans] = useState({});
+    const [ companyOverdue, setCompanyOverdue] = useState({});
+    const [ companyJudicatureInfos, setCompanyJudicatureInfos ] = useState({});
+    const [ companyRelations, setCompanyRelations] = useState({});
+    const [ companyTopManagers, setCompanyTopManagers] = useState({});
 
 
     const timeOut = () => {
@@ -22,19 +32,39 @@ const CompanyReport = (props) => {
         20000);
     }
 
+
     useEffect(() => {
-        form.setFieldsValue({ ...form.getFieldsValue(),
-            name: props.editObj.customerName,
-            companyName: props.editObj.companyName,
-            reportDate:  props.editObj.reportDate?moment(props.editObj.reportDate, 'YYYY-MM-DD'):null,
-        })
-        if(props.editObj.id){
-            setCompanyReportId(props.editObj.id);
-            setAddreportStatus(true);
+        if(props.modalType === 'look'){
+            setAddreportStatus(true)
         }
+    }, [props.visible])
+
+    useEffect(() => {
+
         if(props.editObj.modalType === 'look'){
             setAddreportStatus(true)
         }
+        
+        const list = props.editObj.companyList;
+        
+
+        if(list && list.length > 0){
+            console.log(list);
+            setCompanyList(list);            
+
+            form.setFieldsValue({ ...form.getFieldsValue(),
+                customerId: props.editObj.customerId,
+                name: props.editObj.customerName,
+                companyName: props.editObj.companyName,
+                reportDate:  props.editObj.reportDate?moment(props.editObj.reportDate, 'YYYY-MM-DD'):null,
+            })
+            if(props.editObj.id){
+                setCompanyReportId(props.editObj.id);
+                setAddreportStatus(true);
+            }
+            
+        }
+        
     }, [props.editObj])
 
 
@@ -121,6 +151,70 @@ const CompanyReport = (props) => {
         })
     }
 
+
+    const onChange4Company = (value) =>{
+        if(value){
+
+            request.get('/api/base/company-report/getByCompanyId',{
+                params:{
+                  userId: localStorage.getItem('userId'),
+                  customerId: form.getFieldValue('customerId'),
+                  companyId: value,
+
+                },
+                headers:{
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                }
+              }).then(res => {
+                if(res.code === '0000'){
+                    let list = res.data;
+
+                    list.map(v => {
+                        v.key = v.id;
+                    })
+
+                    setReportDateList(list);
+                }
+              })
+
+        }
+
+    }
+    
+    const onChange4ReportDate = (value) =>{
+        if(value){
+
+            request.get('/api/base/company-report/getById',{
+                params:{
+                  userId: localStorage.getItem('userId'),
+                  id: value,
+                },
+                headers:{
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                }
+              }).then(res => {
+                if(res.code === '0000'){
+                    let data = res.data;
+                    setCompanyAssets({list: data.companyAssets});
+                    setCompanyDebts({list: data.companyDebts});
+                    setCompanyShares({list: data.companyShares});
+                    setCompanyLoans({list: data.companyLoans});
+                    setCompanyOverdue({list: data.companyOverdue});
+                    setCompanyJudicatureInfos({list: data.companyJudicatureInfos});
+                    setCompanyRelations({list: data.companyRelations});
+                    setCompanyTopManagers({list: data.companyTopManagers});
+                    
+                }
+              })
+
+        }
+
+    }
+
+
+
     return (
         <div>
             <Modal
@@ -148,14 +242,6 @@ const CompanyReport = (props) => {
                         <h2>报告基本信息</h2>
                     </Row>
                     <Row gutter={20}>
-                        <Col span={5} >
-                            <Form.Item
-                                name="reportDate"
-                                label="报告日期："
-                            >
-                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
-                            </Form.Item>
-                        </Col>
                         <Col span={3} >
                             <Form.Item
                                 name="name"
@@ -165,13 +251,86 @@ const CompanyReport = (props) => {
                             </Form.Item>
                         </Col>
                         <Col span={8} >
-                            <Form.Item
-                                name="companyName"
-                                label="公司"
-                            >
-                                <Input placeholder="公司"  disabled/>
-                            </Form.Item>
+                            { props.modalType == "add"? 
+                                (<Form.Item
+                                    name="companyId"
+                                    label="企业名称"
+                                >
+                                     <Input placeholder="企业名称"  />
+                                </Form.Item>)
+                                :
+                                (<Form.Item
+                                    name="companyId"
+                                    label="企业名称"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请选择报告企业名称',
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        showSearch
+                                        placeholder="请选择"
+                                        optionFilterProp="children"
+                                        onChange={onChange4Company}
+                                        //onFocus={onFocus4Company}
+                                        //onBlur={onBlur}
+                                        //onSearch={onSearch}
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                    >
+                                        <Select.Option disabled key='0' value='0'>请选择</Select.Option>
+                                        {companyList.map((v,i) => {
+                                            
+                                            return (<Select.Option key={v.id} value={v.id}>{v.name}</Select.Option>);
+                                        })}
+                                    </Select>
+                                </Form.Item>)
+                            }    
                         </Col>
+                        <Col span={5} >
+                            { props.modalType == "add"? 
+                                (<Form.Item
+                                    name="reportDate"
+                                    label="报告日期："
+                                >
+                                    <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
+                                </Form.Item>)
+                                :
+                                (<Form.Item
+                                    name="reportDate"
+                                    label="报告日期："
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请选择报告日期',
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        showSearch
+                                        placeholder="请选择"
+                                        optionFilterProp="children"
+                                        onChange={onChange4ReportDate}
+                                        //onFocus={onFocus4Company}
+                                        //onBlur={onBlur}
+                                        //onSearch={onSearch}
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                    >
+                                        <Select.Option disabled key='0' value='0'>请选择</Select.Option>
+                                        {reportDateList.map((v,i) => {
+                                            
+                                            return (<Select.Option key={v.id} value={v.id}>{v.reportDate}</Select.Option>);
+                                        })}
+                                    </Select>
+                                </Form.Item>)
+                            }    
+                        </Col>
+                        
                         <Col span={4} >
                             <Button type="primary" onClick={addreport} disabled={addreportStatus} >保存</Button>
                             <Button style={{ marginLeft: 12, }} type="primary" 
@@ -198,7 +357,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyShares}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyShare"/>
                     <h2 id='t0'>2.企业高管信息</h2>
@@ -207,7 +366,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyTopManagers}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyTopManager"/>
                     <h2 id='t0'>3.直接关联企业</h2>
@@ -216,7 +375,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyRelations}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyRelation"/>
                     <h2 id='t1'>4.贷款情况</h2>
@@ -225,7 +384,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyLoans}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyLoans"/>
                     <h2 id='t1'>5.企业资产</h2>
@@ -234,7 +393,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyAssets}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyAsset"/>
                     <h2 id='t1'>6.企业负债</h2>
@@ -243,7 +402,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyDebts}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyDebt"/>
                     <h2 id='t1'>7.企业逾期</h2>
@@ -252,7 +411,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyOverdue}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyOverdue"/>
                     <h2 id='t1'>8.企查查（补充）</h2>
@@ -261,7 +420,7 @@ const CompanyReport = (props) => {
                         companyId = {props.editObj.companyId}
                         companyReportId={companyReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={companyJudicatureInfos}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyJudicatureInfo"/>
                     <Button style={{

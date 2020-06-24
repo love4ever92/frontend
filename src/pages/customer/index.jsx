@@ -37,7 +37,7 @@ export default class index extends Component {
       qichachaVisible: false,
       companyObj: {},
       customerReportObj: {},
-      companyReportObj: {},
+      companyReportObj: [],
       qiChaChaObj: {},
       modalType: '',
       customerTitle: '',
@@ -250,6 +250,8 @@ export default class index extends Component {
       customerReportTitle: '查看-客户信用报告',
       companyReportTitle: '查看-企业信用报告',
       qiChaChaTitle: '查看-企查查报告',
+      customerName: "",
+      customerId: ""
     })
     
 
@@ -293,9 +295,7 @@ export default class index extends Component {
   }
 
   changePage = (current, pageSize) => {
-    this.setState({
-      current
-    })
+
     const searchObj1 = this.state.searchObj
     this.getData({
       current,
@@ -309,7 +309,8 @@ export default class index extends Component {
    * 获取公司信息（编辑按钮）
    */
   getCompany = ( customerName, mobilePhone, idNum, customerId ) =>{
-    request.get('/api/base/company/getOne',{
+    
+    request.get('/api/base/company/getByCustomerId',{
       params:{
         userId: localStorage.getItem('userId'),
         customerId,
@@ -322,10 +323,18 @@ export default class index extends Component {
       }
     }).then(res => {
       if(res.code === '0000'){
+        const list = res.data;
+        list.map(v => {
+          v.key = v.id
+          return v
+        })
         this.setState({
           customerVisible: false,
           companyVisible: true,
-          companyObj: {...res.data, customerName,idNum, mobilePhone, customerId, }
+          // companyObj: {...res.data, customerName, idNum, mobilePhone, customerId, }
+          companyObj: {list,customerName,customerId}, 
+          customerName,
+          customerId
         })
       }else{
         message.error(res.data? res.data : '获取公司信息失败，请联系系统运维人员');
@@ -335,16 +344,31 @@ export default class index extends Component {
 
   // 改变客户对话框，同时判断是否打开添加企业对话框
   changeCustomer = (next,customerName,mobilePhone,idNum,customerId) => {
-    
+    console.log(123, next,customerName,mobilePhone,idNum,customerId);
     if (next) {
       if(this.state.modalType === 'add'){
         this.setState({
           customerVisible: false,
-          companyVisible: true,
-          companyObj: {  customerName,idNum, customerId },
+          // companyVisible: true,
+          // companyObj: {  customerName,idNum, customerId },
         })
+        if (this.state.searchObj) {
+          this.bindSerch(this.state.searchObj);
+        } else {
+          this.bindSerch();
+        }
       }else if(this.state.modalType === 'edit'){
-        this.getCompany(customerName, mobilePhone, idNum, customerId);
+        this.setState({
+          customerVisible: false,
+          // companyVisible: true,
+          //companyObj: {  customerName,idNum, customerId },
+        })
+        if (this.state.searchObj) {
+          this.bindSerch(this.state.searchObj);
+        } else {
+          this.bindSerch();
+        }
+        // this.getCompany(customerName, mobilePhone, idNum, customerId);
       }else if(this.state.modalType === 'look'){
         this.getCompany(customerName, mobilePhone, idNum, customerId);
       }
@@ -363,7 +387,7 @@ export default class index extends Component {
   }
 
   getCustomerReport = (customerId, name, companyName, companyId) => {
-    request.get('/api/base/customer-report/getCustomerReport',{
+    request.get('/api/base/customer-report/getCustomerReportList',{
       params:{
         userId: localStorage.getItem('userId'),
         customerId
@@ -374,27 +398,50 @@ export default class index extends Component {
       }
     }).then(res => {
       if(res.code && res.code === '0000'){
+
         this.setState({
-          companyVisible: false,
-          customerReportVisible: true,
-          customerReportObj:{...res.data, 
+          customerReportObj:{ 
+            customerReportList: res.data,
             customerReportId: res.code.id,
             customerId,
             customerName:name, 
             companyName, 
-            companyId}
+            companyId},
+        }, () => {
+          this.setState({
+            customerReportObj:{ 
+              customerReportList: res.data,
+              customerReportId: res.code.id,
+              customerId,
+              customerName:name, 
+              companyName, 
+              companyId},
+            companyVisible: false,
+            customerReportVisible: true,
+          })
         })
       }else if(res.code && res.code === '1111'){
-        this.setState({
-          companyVisible: false,
-          customerReportVisible: true,
-          customerReportObj:{
-            customerId,
-            customerName:name, 
-            companyName, 
-            companyId
+        let that = this;
+        Modal.confirm({
+          title: '提示',
+          content: '还未添加客户信用报告。',
+          onOk() {
+            that.setState({
+              companyVisible: false,
+              customerReportVisible: true,
+              customerReportObj:{
+                customerId,
+                customerName:name, 
+                companyName, 
+                companyId
+              }
+            })
+          },
+          onCancel() {
+            
           }
-        })
+      }) 
+        
       }else{
         message.info(res.data);
       }
@@ -414,7 +461,7 @@ export default class index extends Component {
       }else if(this.state.modalType === 'edit'){
         this.getCustomerReport(customerId, customerName, companyName, companyId)
       }else if(this.state.modalType === 'look'){
-        console.log(this.state.modalType );
+
         this.getCustomerReport(customerId, customerName, companyName, companyId)
       }
       
@@ -431,11 +478,11 @@ export default class index extends Component {
   }
 
   getCompanyReport = (customerId, name, companyName, companyId) =>{
-    
-    request.get('/api/base/company-report/getCompanyReport',{
+
+    request.get('/api/base/company/getByCustomerId',{
       params:{
         userId: localStorage.getItem('userId'),
-        companyId
+        customerId,
       },
       headers:{
         'Content-Type': 'application/json',
@@ -446,8 +493,8 @@ export default class index extends Component {
         this.setState({
           customerReportVisible: false,
           companyReportVisible: true,
-          companyReportObj:{...res.data, 
-            companyReportId: res.code.id,
+          companyReportObj:{
+            companyList: res.data, 
             customerId,
             customerName:name, 
             companyName, 
@@ -545,6 +592,8 @@ export default class index extends Component {
           
         />
         <CompanyModal
+          customerId={this.state.customerId}
+          customerName={this.state.customerName}
           title= {this.state.companyTitle}  
           visible={this.state.companyVisible}
           setVisible={this.changeCompany}
@@ -552,13 +601,18 @@ export default class index extends Component {
           modalType={this.state.modalType}
         />
         <CustomerReport
-          title= {this.state.customerReportTitle}  
-          visible={this.state.customerReportVisible}
-          setVisible={this.changeCustomerReport}
-          editObj={this.state.customerReportObj}
-          modalType={this.state.modalType}
-        />
+            customerId={this.state.customerId}
+            customerName={this.state.customerName}
+            title= {this.state.customerReportTitle}  
+            visible={this.state.customerReportVisible}
+            setVisible={this.changeCustomerReport}
+            editObj={this.state.customerReportObj}
+            modalType={this.state.modalType}
+          />
+        
         <CompanyReport
+          customerId={this.state.customerId}
+          customerName={this.state.customerName}
           title= {this.state.companyReportTitle}  
           visible={this.state.companyReportVisible}
           setVisible={this.changeCompanyReport}

@@ -28,6 +28,7 @@ const AddModal = (props) => {
             content: '确定取消添加订单',
             onOk() {
                 props.setVisible(false);
+                form.resetFields();
             },
             onCancel() {
 
@@ -56,6 +57,83 @@ const AddModal = (props) => {
         })
     }
 
+    /**
+     * 校验字符串是小数还是整数
+     * 如果是小数或者整数就返回true
+     * @param {*} str 
+     */
+    const checkeNum1 = (str) =>{
+        str = str.toString();
+        const reg = new RegExp(/^[0-9]*$/);
+        if(str.indexOf(".") === -1){
+            if(str.length>1){
+                if(str.charAt(0) == 0){
+                    return false;
+                }
+            }
+            if(str.length > 0 && reg.test(str)){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            const s = str.split(".");
+            if(s.length !== 2){
+                return false;
+            }else{
+                if(s[0].length > 1){
+                    if(s[0].charAt(0) == 0){
+                        return false;
+                    }
+                }
+                if(s[0].length > 0 && reg.test(s[0])){
+                    if(s[1].length > 0 && reg.test(s[1])){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }else{
+                    return false;
+                }
+            }
+        }
+    }
+
+     /**
+     * 校验字符串是小数还是整数
+     * 如果是整数就返回true
+     * @param {*} str 
+     */
+    const checkeNum2 = (str) =>{
+
+        str = str.toString();
+        
+        console.log("str",str)
+        const reg = new RegExp(/^[0-9]*$/);
+        if(str.indexOf(".") === -1){
+            if(str.length>1){
+
+                if(str.charAt(0) == 0){
+                    return false;
+                }
+            }
+
+            console.log(reg.test(str));
+            console.log("str.length",str.length);
+            if(str.length > 0 && reg.test(str)){
+
+                return true;
+            }else{
+
+                return false;
+            }
+        }else{
+
+            return false;
+        }
+    }
+
+
     const onFinish = () => {
         if (isSubmit) {
             setIsSubmit(false);
@@ -64,15 +142,15 @@ const AddModal = (props) => {
                 // if(moment().isBefore(moment().locale('zh-cn').format('YYYY-MM-DD'),
                 //     form.getFieldValue('operatTime').format('YYYY-MM-DD'))){
                 //     // eslint-disable-next-line eqeqeq
-                if (Math.floor(form.getFieldValue('loan').trim()) == form.getFieldValue('loan').trim()) {
+                if (checkeNum2(form.getFieldValue('loan').trim())) {
                     // eslint-disable-next-line eqeqeq
-                    if (Math.floor(form.getFieldValue('serviceRate').trim()) == form.getFieldValue('serviceRate').trim()) {
+                    if (checkeNum1(form.getFieldValue('serviceRate').trim())) {
                         // eslint-disable-next-line eqeqeq
-                        if (Math.floor(form.getFieldValue('serviceMoney').trim()) == form.getFieldValue('serviceMoney').trim()) {
+                        if (checkeNum2(form.getFieldValue('serviceMoney').trim())) {
                             // eslint-disable-next-line eqeqeq
-                            if (Math.floor(form.getFieldValue('otherCost').trim()) == form.getFieldValue('otherCost').trim()) {
+                            if (checkeNum2(form.getFieldValue('otherCost').trim())) {
                                 // eslint-disable-next-line eqeqeq
-                                if (Math.floor(form.getFieldValue('getMoney').trim()) == form.getFieldValue('getMoney').trim()) {
+                                if (checkeNum2(form.getFieldValue('getMoney').trim())) {
                                     if (Math.floor(form.getFieldValue('getMoney').trim()) <= form.getFieldValue('serviceMoney').trim()) {
                                         // 校验完成
                                         const data = {
@@ -174,12 +252,15 @@ const AddModal = (props) => {
     }
 
     async function  onChange4Customer (value) {
-        
+        setCompanyOptions([]); 
+        form.setFieldsValue({...form.getFieldsValue(),
+            "companyId" : "0"
+        });
         try {
-            const res = await request.get('/api/base/company/getOne', {
+            const res = await request.get('/api/base/company/getByCustomerId', {
               params: {
                 userId: localStorage.getItem('userId'),
-                customerId: value.split(":")[0],
+                customerId: form.getFieldValue("customerId").toString().split(":")[0],
               },
               headers: {
                 'Content-Type': 'application/json',
@@ -187,22 +268,38 @@ const AddModal = (props) => {
               },
             })
             if (res.code === '0000') {
-                let a = [];
-                a.push(res.data);
-                setCompanyOptions(a);
+                setCompanyOptions(res.data); 
+                console.log(companyOptions);
             }
           } catch (error) {
             console.log(111, error);
           }     
-        
     }
 
     function onBlur() {
         console.log('blur');
     }
 
-    function onFocus() {
-        console.log('focus');
+    async function onFocus4Company() {
+
+        try {
+            const res = await request.get('/api/base/company/getByCustomerId', {
+              params: {
+                userId: localStorage.getItem('userId'),
+                customerId: form.getFieldValue("customerId").toString().split(":")[0],
+              },
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            })
+            if (res.code === '0000') {
+                setCompanyOptions(res.data); 
+                console.log(companyOptions);
+            }
+          } catch (error) {
+            console.log(111, error);
+          }     
     }
 
     function onSearch(val) {
@@ -278,7 +375,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -310,7 +407,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange4Customer}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -340,7 +437,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -370,12 +467,13 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
+                                    
                                 >
                                     <Select.Option disabled key='0' value='0'>请选择</Select.Option>
                                     {props.staffOptions.map(v => {
@@ -400,7 +498,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -432,7 +530,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus4Company}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -462,7 +560,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -538,7 +636,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>
@@ -599,7 +697,7 @@ const AddModal = (props) => {
                                     placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
-                                    onFocus={onFocus}
+                                    // onFocus={onFocus}
                                     onBlur={onBlur}
                                     onSearch={onSearch}
                                     filterOption={(input, option) =>

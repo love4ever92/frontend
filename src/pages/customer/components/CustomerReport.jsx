@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Input, Row, Col,  DatePicker,message } from 'antd'
+import { Modal, Button, Form, Input, Row, Col,  DatePicker,message,Select  } from 'antd'
 import request from '@/utils/request';
 import moment from 'moment';
 import EditableTable from './EditableTable';
+import { List } from 'antd/es/form/Form';
 
 
 
@@ -13,26 +14,74 @@ const CustomerReport = (props) => {
     const [addreportStatus, setAddreportStatus] = useState(false);
     const [customerReportId,setCustomerReportId] = useState(0);
     const [ isSubmit, setIsSubmit ] = useState(true);
+    const [ reportDateList, setReportDateList ] = useState([]);
+    const [ customerLoan, setCustomerLoan ] = useState({});
+    const [ customerAsset, setCustomerAsset ] = useState({});
+    const [ customerGuarantee, setCustomerGuarantee ] = useState({});
+    const [ customerDebt, setCustomerDebt ] = useState({});
+    const [ customerOverdue, setCustomerOverdue ] = useState({});
+    const [ loanQuery, setLoanQuery ] = useState({});
+    const [ t, setT ] = useState("");
 
-
-    
-
+    useEffect(() => {
+        if(props.modalType === 'look'){
+            setAddreportStatus(true)
+        }
+    }, [props.visible])
 
     useEffect(() => {
         
-        form.setFieldsValue({ ...form.getFieldsValue(),
-            name: props.editObj.customerName,
-            reportDate:  props.editObj.reportDate?moment(props.editObj.reportDate, 'YYYY-MM-DD'):null,
-        })
+        const list = props.editObj.customerReportList;
+    
+
+        if(list && list.length > 0){
+
+            setReportDateList(list);
+            console.log(list);
+            form.setFieldsValue({ 
+                ...form.getFieldsValue(),
+                customerName: props.customerName,
+                customerId: props.customerId,
+                reportDate: `0:${list[0].id}:${list[0].reportDate}`,
+            })
+            setCustomerLoan({
+                list: list[0].customerLoans,
+            });
+            setCustomerAsset({
+                list: list[0].customerAssets,
+            });
+            setCustomerGuarantee({
+                list: list[0].customerGuarantees
+            });
+            setCustomerDebt({
+                list: list[0].customerDebts
+            });
+            setCustomerOverdue({
+                list: list[0].customerOverdues
+            });
+            setLoanQuery({
+                list: list[0].loanQueries
+            });
+            
+        }else{
+            form.setFieldsValue({ 
+                ...form.getFieldsValue(),
+                customerName: props.customerName,
+                customerId: props.customerId,
+                reportDate:  props.editObj.reportDate ? moment(props.editObj.reportDate, 'YYYY-MM-DD') : null,
+            })
+        }
+        
         if(props.editObj.id){
             setCustomerReportId(props.editObj.id);
             setAddreportStatus(true);
         }
-        if(props.editObj.modalType === 'look'){
-            setAddreportStatus(true)
-        }
-    }, [props.editObj])
 
+        if(props.editObj.modalType === 'look'){
+            setAddreportStatus(true);
+        }
+
+    }, [props.editObj])
 
 
 
@@ -80,7 +129,7 @@ const CustomerReport = (props) => {
             }else if(props.modalType === 'look'){
                 props.setVisible(true,
                     props.editObj.customerId, 
-                    props.editObj.customerName, 
+                    form.getFieldValue("customerName"), 
                     props.editObj.companyName,
                     props.editObj.companyId);
             }
@@ -121,6 +170,34 @@ const CustomerReport = (props) => {
         })
     }
 
+
+
+
+
+    const onChange = (value) =>{
+        const item = props.editObj.customerReportList.find(v  => v.id == value.split(":")[1] )
+        console.log(value, item);
+        setCustomerLoan({
+            list: item.customerLoans,
+        });
+        setCustomerAsset({
+            list: item.customerAssets,
+        });
+        setCustomerGuarantee({
+            list: item.customerGuarantees
+        });
+        setCustomerDebt({
+            list: item.customerDebts
+        });
+        setCustomerOverdue({
+            list: item.customerOverdues
+        });
+        setLoanQuery({
+            list: item.loanQueries
+        });   
+    }
+
+
     return (
         <div>
             <Modal
@@ -149,19 +226,51 @@ const CustomerReport = (props) => {
                     </Row>
                     <Row gutter={30}>
                         <Col span={5} >
-                            <Form.Item
-                                name="reportDate"
-                                label="报告日期："
-                            >
-                                <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
-                            </Form.Item>
+                                { props.modalType == "add"? 
+                                (<Form.Item
+                                    name="reportDate"
+                                    label="报告日期："
+                                >
+                                    <DatePicker format='YYYY-MM-DD' disabled={addreportStatus}/>
+                                </Form.Item>)
+                                :
+                                (<Form.Item
+                                    name="reportDate"
+                                    label="报告日期："
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请选择报告日期',
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        showSearch
+                                        placeholder="请选择"
+                                        optionFilterProp="children"
+                                        onChange={onChange}
+                                        //onFocus={onFocus4Company}
+                                        //onBlur={onBlur}
+                                        //onSearch={onSearch}
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                    >
+                                        <Select.Option disabled key='0' value='0'>请选择</Select.Option>
+                                        {reportDateList.map((v,i) => {
+                                            
+                                            return (<Select.Option key={v.id} value={`${i}:${v.id}:${v.reportDate}`}>{v.reportDate}</Select.Option>);
+                                        })}
+                                    </Select>
+                                </Form.Item>)
+                                }    
                         </Col>
                         <Col span={5} >
                             <Form.Item
-                                name="name"
+                                name="customerName"
                                 label="客户姓名"
                             >
-                                <Input placeholder="客户姓名"  disabled/>
+                                <Input placeholder="客户姓名"  disabled={addreportStatus}/>
                             </Form.Item>
                         </Col>
                         <Col span={4} >
@@ -190,7 +299,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={customerLoan}
                         // eslint-disable-next-line react/no-string-refs
                         type="loanInfos"/>
                     <h2 id='t1'>2.逾期记录</h2>
@@ -198,7 +307,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={customerOverdue}
                         // eslint-disable-next-line react/no-string-refs
                         type="overdues"/>
                     <h2 id='t1'>3.对外担保</h2>
@@ -206,7 +315,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={customerGuarantee}
                         // eslint-disable-next-line react/no-string-refs
                         type="guarantees"/>
                     <h2 id='t1'>4.查询记录</h2>
@@ -214,7 +323,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={loanQuery}
                         // eslint-disable-next-line react/no-string-refs
                         type="loanquerys"/>
                     <h2 id='t1'>5.资产记录</h2>
@@ -222,7 +331,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={customerAsset}
                         // eslint-disable-next-line react/no-string-refs
                         type="assets"/>
                     <h2 id='t1'>6.负债记录</h2>
@@ -230,7 +339,7 @@ const CustomerReport = (props) => {
                         customerId={props.editObj.customerId}
                         customerReportId={customerReportId}
                         modalType={props.modalType}
-                        editObj={props.editObj}
+                        editObj={customerDebt}
                         // eslint-disable-next-line react/no-string-refs
                         type="debts"/>
                     <Button style={{

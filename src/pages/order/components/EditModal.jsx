@@ -196,7 +196,7 @@ const EditModal = (props) => {
     async function  onChange4Customer (value) {
         
         try {
-            const res = await request.get('/api/base/company/getOne', {
+            const res = await request.get('/api/base/company/getByCustomerId', {
               params: {
                 userId: localStorage.getItem('userId'),
                 customerId: value.split(":")[0],
@@ -276,7 +276,7 @@ const EditModal = (props) => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: '请选择部门成立日期',
+                                        message: '请选择操作时间',
                                     },
                                 ]}
                             >

@@ -244,9 +244,7 @@ export default class index extends Component {
 
   changePage = (current, pageSize) => {
 
-    this.setState({
-      current
-    })
+
     const searchObj1 = this.state.searchObj
     this.getData({
       current,

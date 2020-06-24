@@ -19,8 +19,9 @@ const CompanyModal = (props) => {
     const [ imgVisible, setImgVisible] = useState(false);
     const [ isSubmit, setIsSubmit ] = useState(true);
     const [ isLongTime, setIsLongTime ] = useState(true);
-
-
+    const [ customerOptions, setCustomerOptions ] = useState([]);
+    const [companyOptions, setCompanyOptions] = useState([]);
+    const [ isRequired, setIsRequired ] = useState(true)
 
     const photo = {
         action: '../photos/',
@@ -96,11 +97,26 @@ const CompanyModal = (props) => {
     }
 
     useEffect(() => {
-        console.log(111,props.editObj);
-        form.setFieldsValue({ ...props.editObj, 
-            setTime: props.editObj.setTime?moment(props.editObj.setTime, 'YYYY-MM-DD'):null,
-            endTime: props.editObj.endTime?moment(props.editObj.endTime, 'YYYY-MM-DD'):null,
-    });
+        
+        if(props.editObj.list && props.editObj.list.length > 0){
+            form.setFieldsValue({ ...props.editObj.list[0], 
+                companyId: `0:${props.editObj.list[0].id}:${props.editObj.list[0].name}`,
+                customerId: `${props.editObj.customerId}`,
+                setTime: props.editObj.list[0].setTime?moment(props.editObj.list[0].setTime, 'YYYY-MM-DD'):null,
+                endTime: props.editObj.list[0].endTime?moment(props.editObj.list[0].endTime, 'YYYY-MM-DD'):null,
+                
+            });
+        }else{
+            form.setFieldsValue({ 
+                setTime: null,
+                endTime: null,
+            });
+        }
+        
+        if(props.modalType === "look"){
+            setCompanyOptions(props.editObj.list); 
+            setIsRequired(false);
+        }
     }, [props.editObj])
 
     useEffect(() => {
@@ -110,6 +126,19 @@ const CompanyModal = (props) => {
             if(props.editObj.province){
                 companyProvinceHandleChange(props.editObj.province.split(":")[0]);
             }
+            request.get("/api/base/customer/list1",{
+                params: {userId:localStorage.getItem('userId')},
+                headers:{
+               'Content-Type': 'application/json',
+               'Accept': 'application/json',
+               }
+             }).then(res =>{ 
+               if(res.code === '0000'){
+                setCustomerOptions(res.data)
+               }else{
+                 message.error('获取数据失败！');
+               }
+             })
         }
     }, [props.visible])
 
@@ -251,10 +280,14 @@ const CompanyModal = (props) => {
                         },                
                     })
                 }else if(props.modalType === 'look'){
-                    props.setVisible(true,props.editObj.customerId, 
-                        props.editObj.customerName, 
-                        form.getFieldValue('name'),
-                        form.getFieldValue('id'));
+                    console.log(12345,props.editObj.customerId);
+                    props.setVisible(
+                        true,
+                        props.editObj.customerId,
+                        props.editObj.customerName,
+                        form.getFieldValue().companyId?form.getFieldValue().companyId.split(":")[2]:null,
+                        form.getFieldValue().companyId?form.getFieldValue().companyId.split(":")[1]:null,
+                    );
                 }
                 setIsSubmit(true);
             }catch(e){
@@ -307,8 +340,6 @@ const CompanyModal = (props) => {
             console.log(111, error);
 
         }
-
-
     }
     /**
      * 下拉框获取城市
@@ -375,10 +406,20 @@ const CompanyModal = (props) => {
 
     const companyAreaHandleChange = () => {
     }
+
     const seeBig = () =>{
         setImgVisible(true);          
     }
     
+    const onChange = (value) =>{
+        const data = props.editObj[value.split(":")[0]];
+        form.setFieldsValue({ ...data, 
+            // companyId: `${props.editObj[0].id}:${props.editObj[0].name}`,
+            setTime: data.setTime?moment(props.editObj[0].setTime, 'YYYY-MM-DD'):null,
+            endTime: data.endTime?moment(props.editObj[0].endTime, 'YYYY-MM-DD'):null,
+        });
+    }
+
 
     return (
         <div>
@@ -402,71 +443,168 @@ const CompanyModal = (props) => {
                     onFinish={onFinish}
                 >
                     <Row gutter={24}>
-                        <Col span={5} >
+                        <Col span={5} hidden>
                             <Form.Item
                                 name="id"
                                 label="公司编号"
-                                
                             >
                                 <Input disabled />
                             </Form.Item>
                         </Col>
-                        <Col span={9} >
-                            <Form.Item
-                                name="name"
-                                label="公司名称"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入公司名称',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder="请输入公司名称" disabled ={props.modalType==='look' || (props.modalType === 'edit' && form.getFieldValue('name')) }/>
-                            </Form.Item>
+                        <Col span={12} >
+                            
+
+                            {props.modalType == "edit" || props.modalType == "add"? 
+                                (<Form.Item
+                                    name="name"
+                                    label="企业名称"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请输入企业名称',
+                                        },
+                                    ]}
+                                >
+                                    <Input placeholder="请输入企业名称" 
+                                    disabled ={props.modalType==='look' 
+                                        || 
+                                        (props.modalType === 'edit' && form.getFieldValue('name'))
+                                         }/>
+                                </Form.Item>)
+                                :
+                                (<Form.Item
+                                    name="companyId"
+                                    label="企业名称"
+                                >
+                                    <Select
+                                        showSearch
+                                        placeholder={props.modalType=="look"?"":"请选择"}
+                                        optionFilterProp="children"
+                                        onChange={onChange}
+                                        //onFocus={onFocus4Company}
+                                        //onBlur={onBlur}
+                                        //onSearch={onSearch}
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                    >
+                                        <Select.Option disabled key='0' value='0'>请选择</Select.Option>
+                                        {companyOptions.map((v,i) => {
+                                            
+                                        return (<Select.Option key={v.id} value={`${i}:${v.id}:${v.name}`}>{v.name}</Select.Option>);
+                                        })}
+                                    </Select>
+                                </Form.Item>)
+                                }    
                         </Col>
-                        <Col span={10} >
-                            <Form.Item
-                                name="companyCode"
-                                label="统一信用编码"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入公司统一信用编码',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder="请输入公司统一信用编码" disabled ={props.modalType==='look' || (props.modalType === 'edit' && form.getFieldValue('name'))}/>
-                            </Form.Item>
+                        <Col span={12} >
+                            {
+                                props.modalType==='look' ? (<Form.Item
+                                    name="companyCode"
+                                    label="统一信用编码"
+                                    rules={[
+                                        {
+                                            required: false,
+                                            message: '请输入公司统一信用编码',
+                                        },
+                                    ]}
+                                >
+                                    <Input 
+                                        placeholder="" 
+                                        disabled />
+                                </Form.Item>) : (<Form.Item
+                                    name="companyCode"
+                                    label="统一信用编码"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请输入公司统一信用编码',
+                                        },
+                                    ]}
+                                >
+                                    <Input 
+                                        placeholder="请输入公司统一信用编码" 
+                                        />
+                                </Form.Item>)
+                            }
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={12} >
+                    <Col span={7} >
                             <Form.Item
-                                name="registerMoney"
-                                label="公司注册资金"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入公司注册资金',
-                                    },
-                                ]}
+                                name="customerId"
+                                label="客户姓名"
+                                
                             >
-                                <Input placeholder="请输入公司注册资金" prefix="￥" suffix="万元" disabled ={props.modalType==='look'}/>
+                               <Select
+                                    showSearch
+                                    placeholder={props.modalType=="look"?"":"请选择"}
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    disabled
+                                >
+                                    <Select.Option disabled key='0' value='0'>请选择</Select.Option>
+                                    {customerOptions.map(v => {
+                                        return (<Select.Option key={v.id} value={v.id}>{v.name}</Select.Option>);
+                                    })}
+                                </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12} >
+                        <Col span={8} >
+                            {
+                                props.modalType==='look'?
+                                    (<Form.Item
+                                        name="registerMoney"
+                                        label="公司注册资金"
+                                        rules={[
+                                            {
+                                                required: false,
+                                                message: '请输入公司注册资金',
+                                            },
+                                        ]}
+                                    >
+                                        <Input 
+                                            placeholder="" 
+                                            prefix="￥" 
+                                            suffix="万元" 
+                                            disabled = {props.modalType==='look'}
+                                            />
+                                    </Form.Item>)
+                                :
+                                    (<Form.Item
+                                        name="registerMoney"
+                                        label="公司注册资金"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: '请输入公司注册资金',
+                                            },
+                                        ]}
+                                    >
+                                        <Input 
+                                            placeholder="请输入公司注册资金" 
+                                            prefix="￥" 
+                                            suffix="万元" 
+                                            disabled = {props.modalType==='look'}
+                                            />
+                                    </Form.Item>)
+                            }
+                            
+                        </Col>
+                        <Col span={9} >
                             <Form.Item
                                 name="companyType"
                                 label="公司类型"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: isRequired,
                                         message: '公司类型',
                                     },
                                 ]}
                             >
-                                <Select defaultValue="0" onChange={typeHandleChange} disabled ={props.modalType==='look'}>
+                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={typeHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key="0" value="0" disabled >请选择</Select.Option>
                                     <Select.Option key="1" value={1}>有限责任公司</Select.Option>
                                     <Select.Option key="2" value={2}>股份有限公司</Select.Option>
@@ -483,12 +621,15 @@ const CompanyModal = (props) => {
                                 label="法人"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: isRequired,
                                         message: '法人姓名',
                                     },
                                 ]}
                             >
-                                <Input placeholder="法人姓名" disabled ={props.modalType==='look'}/>
+                                <Input 
+                                    placeholder={props.modalType=="look"?"":"法人姓名"}
+                                    disabled ={props.modalType==='look'}
+                                />
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -496,16 +637,16 @@ const CompanyModal = (props) => {
                                 name="mobilePhone"
                                 label="手机号码"
                                 rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入手机号码',
-                                    },
+                                   
                                     {
                                         pattern: /^1[3|4|5|7|8|9][0-9]\d{8}$/, message: '请输入正确的手机号码'
                                     }
                                 ]}
                             >
-                                <Input placeholder="请输入客户手机号码" disabled={props.modalType==='look'} />
+                                <Input 
+                                    placeholder={props.modalType=="look"?"":"请输入客户手机号码"}
+                                    disabled={props.modalType==='look'}
+                                />
                             </Form.Item>
                         </Col>
                         <Col span={10} >
@@ -514,12 +655,15 @@ const CompanyModal = (props) => {
                                 label="身份证"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: isRequired,
                                         message: '请输入法人身份证号码',
                                     },
                                 ]}
                             >
-                                <Input placeholder="请输入法人身份证号码" disabled ={props.modalType==='look'}/>
+                                <Input 
+                                    placeholder={props.modalType=="look"?"":"请输入法人身份证号码"}
+                                    disabled ={props.modalType==='look'}
+                                />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -536,7 +680,7 @@ const CompanyModal = (props) => {
                                 label=""
                                 rules={[
                                     {
-                                        required: true,
+                                        required: isRequired,
                                         message: '请选择',
                                     },
                                 ]}
@@ -610,7 +754,7 @@ const CompanyModal = (props) => {
                                 name="address"
                                 label=""
                             >
-                                <Input placeholder="请输入详细地址" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType=="look"?"":"请输入详细地址"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -620,7 +764,7 @@ const CompanyModal = (props) => {
                                 name="invoiceMoney"
                                 label="年开票金额"
                             >
-                                <Select defaultValue="0" onChange={invoiceMoneyHandleChange} disabled ={props.modalType==='look'}>
+                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={invoiceMoneyHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
                                     <Select.Option key='1' value={1}>0-50万</Select.Option>
                                     <Select.Option key='2' value={2}>50-100万</Select.Option>
@@ -635,7 +779,7 @@ const CompanyModal = (props) => {
                                 name="payTaxes"
                                 label="年纳税金额"
                             >
-                                <Select defaultValue="0" onChange={payTaxesHandleChange} disabled ={props.modalType==='look'}>
+                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={payTaxesHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
                                     <Select.Option key='1' value={1}>0-50万</Select.Option>
                                     <Select.Option key='2' value={2}>50-100万</Select.Option>
@@ -650,7 +794,7 @@ const CompanyModal = (props) => {
                                 name="taxLevel"
                                 label="纳税评级"
                             >
-                                <Select defaultValue="0" onChange={taxLevelHandleChange} disabled ={props.modalType==='look'}>
+                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={taxLevelHandleChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key='0' value="0">请选择</Select.Option>
                                     <Select.Option key='1' value="A">A</Select.Option>
                                     <Select.Option key='2' value="B">B</Select.Option>
@@ -667,7 +811,7 @@ const CompanyModal = (props) => {
                                 name="businessScope"
                                 label="经营范围"
                             >
-                                <Input placeholder="请输入经营范围" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType=="look"?"":"请输入经营范围"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -678,7 +822,7 @@ const CompanyModal = (props) => {
                                 label="成立日期"
                             rules={[
                                 {
-                                    required: true,
+                                    required: isRequired,
                                     message: '请选择成立日期',
                                 },
                             ]}
@@ -695,12 +839,12 @@ const CompanyModal = (props) => {
                                 label="期限类型"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: isRequired,
                                         message: '请选择期限类型',
                                     },
                                 ]}
                             >
-                                <Select defaultValue="0" onChange={timeTypeoOnChange} disabled ={props.modalType==='look'}>
+                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={timeTypeoOnChange} disabled ={props.modalType==='look'}>
                                     <Select.Option key="0" value="0" disabled >请选择</Select.Option>
                                     <Select.Option key="1" value={1}>固定期限</Select.Option>
                                     <Select.Option key="2" value={2}>长期</Select.Option>
@@ -725,7 +869,7 @@ const CompanyModal = (props) => {
                                 name="remark"
                                 label="备注"
                             >
-                                <Input placeholder="请输入备注" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType=="look"?"":"请输入备注"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>

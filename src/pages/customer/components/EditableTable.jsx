@@ -862,8 +862,11 @@ class EditableTable extends React.Component {
                 submitData: [],
             };
         }else if(this.props.modalType === 'edit' || this.props.modalType === 'look'){
-            if (this.props.type === 'loanInfos' && this.props.editObj.customerLoans) {
-                const list = this.props.editObj.customerLoans;
+
+            if (this.props.type === 'loanInfos' && this.props.editObj.list) {
+                
+                const list = this.props.editObj.list;
+
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -879,8 +882,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'overdues' && this.props.editObj.customerOverdues) {
-                const list = this.props.editObj.customerOverdues;
+            } else if (this.props.type === 'overdues' && this.props.editObj.list) {
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -896,8 +899,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'guarantees' && this.props.editObj.customerGuarantees) {
-                const list = this.props.editObj.customerGuarantees;
+            } else if (this.props.type === 'guarantees' && this.props.editObj.list) {
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -913,8 +916,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'loanquerys' && this.props.editObj.loanQueries) {
-                const list = this.props.editObj.loanQueries;
+            } else if (this.props.type === 'loanquerys' && this.props.editObj.list) {
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -931,8 +934,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'assets' && this.props.editObj.customerAssets) {
-                const list = this.props.editObj.customerAssets;
+            } else if (this.props.type === 'assets' && this.props.editObj.list) {
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -949,8 +952,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'debts' && this.props.editObj.customerDebts) {
-                const list = this.props.editObj.customerDebts;
+            } else if (this.props.type === 'debts' && this.props.editObj.list) {
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -967,8 +970,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'companyShare' && this.props.editObj.companyShares){
-                const list = this.props.editObj.companyShares;
+            } else if (this.props.type === 'companyShare' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -984,8 +987,9 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            } else if (this.props.type === 'companyLoans' && this.props.editObj.companyLoans){
-                const list = this.props.editObj.companyLoans;
+            } else if (this.props.type === 'companyLoans' && this.props.editObj.list){
+                
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1001,8 +1005,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyAsset' && this.props.editObj.companyAssets){
-                const list = this.props.editObj.companyAssets;
+            }else if (this.props.type === 'companyAsset' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1018,8 +1022,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyDebt' && this.props.editObj.companyDebts){
-                const list = this.props.editObj.companyDebts;
+            }else if (this.props.type === 'companyDebt' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1035,8 +1039,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyOverdue' && this.props.editObj.companyOverdues){
-                const list = this.props.editObj.companyOverdues;
+            }else if (this.props.type === 'companyOverdue' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1052,8 +1056,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyJudicatureInfo' && this.props.editObj.companyJudicatureInfos){
-                const list = this.props.editObj.companyJudicatureInfos;
+            }else if (this.props.type === 'companyJudicatureInfo' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1069,8 +1073,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyTopManager' && this.props.editObj.companyTopManagers){
-                const list = this.props.editObj.companyTopManagers;
+            }else if (this.props.type === 'companyTopManager' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1086,8 +1090,8 @@ class EditableTable extends React.Component {
                     submitData: [],
                     dataSource: list,
                 };
-            }else if (this.props.type === 'companyRelation' && this.props.editObj.companyRelations){
-                const list = this.props.editObj.companyRelations;
+            }else if (this.props.type === 'companyRelation' && this.props.editObj.list){
+                const list = this.props.editObj.list;
                 if(list.length > 0){
                     list.map(v => {
                         // eslint-disable-next-line no-param-reassign
@@ -1113,7 +1117,32 @@ class EditableTable extends React.Component {
                     dataSource: [],
                 };
             }
+        } 
+    }
+
+    componentDidUpdate  () {
+        let list = this.props.editObj.list;
+
+        if(list && list.length > 0){
+            list.map(v => {
+                // eslint-disable-next-line no-param-reassign
+                v.key = v.id
+                return v
+            }); 
+            if(list !== this.state.dataSource){
+                this.setState({
+                    dataSource :list,
+                })
+            }  
+        }else{
+            list = null;
+            if(list !== this.state.dataSource){
+                this.setState({
+                    dataSource :list,
+                })
+            }
         }
+            
         
     }
 
@@ -1143,8 +1172,6 @@ class EditableTable extends React.Component {
             const dataSource = [ ...this.state.dataSource ];
             this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
         }
-        
-
     };
 
     handleAdd = () => {
@@ -1854,7 +1881,9 @@ class EditableTable extends React.Component {
         })
     }
 
-
+    
+       
+    
 
     render() {
         const { dataSource } = this.state;

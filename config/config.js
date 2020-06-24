@@ -108,6 +108,27 @@ export default defineConfig({
               component: './customer',
               authority: ['管理员','部门经理','员工'],
             },
+            {
+              name: '企业管理',
+              icon: 'table',
+              path: '/company',
+              component: './company',
+              authority: ['管理员','部门经理','员工'],
+            },
+            {
+              name: '客户信用报告管理',
+              icon: 'table',
+              path: '/customer_report',
+              component: './customer_report',
+              authority: ['管理员','部门经理','员工'],
+            },
+            {
+              name: '企业信用报告管理',
+              icon: 'table',
+              path: '/company_report',
+              component: './company_report',
+              authority: ['管理员','部门经理','员工'],
+            },
             // {
             //   name: '客户信息详情',
             //   icon: 'table',
