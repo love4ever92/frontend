@@ -142,32 +142,35 @@ const CustomerReport = (props) => {
     }
 
     const addreport = () =>{
-
+        
         if(!form.getFieldValue('reportDate') || form.getFieldValue('reportDate') == 'Invalid date'){
             message.error('请选择正确的日期！！');
             return;
         }
-        request.post("/api/base/customer-report/add",{
-            data: { ...form.getFieldsValue,
-                reportDate: form.getFieldValue('reportDate').format('YYYY-MM-DD'),
-                lendUnit: form.getFieldValue('lendUnit'),
-                userId: localStorage.getItem("userId"),
-                customerId: props.editObj.customerId,
-                lendPeople: form.getFieldValue('lendPeople'),
-            },
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        }).then(res => {
-            if(res.code === '0000'){
-                message.info('客户信用报告基本信息保存成功，请继续录入详细资料');
-                setAddreportStatus(true);
-                setCustomerReportId(res.data)
-            }else{
-                message.error(res.data);
-            }
-        })
+        if(form.getFieldValue('reportDate')){
+            request.post("/api/base/customer-report/add",{
+                data: { ...form.getFieldsValue,
+                    reportDate: form.getFieldValue('reportDate').format('YYYY-MM-DD'),
+                    lendUnit: form.getFieldValue('lendUnit'),
+                    userId: localStorage.getItem("userId"),
+                    customerId: props.editObj.customerId,
+                    lendPeople: form.getFieldValue('lendPeople'),
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            }).then(res => {
+                if(res.code === '0000'){
+                    message.info('客户信用报告基本信息保存成功，请继续录入详细资料');
+                    setAddreportStatus(true);
+                    setCustomerReportId(res.data)
+                }else{
+                    message.error(res.data);
+                }
+            })
+        }
+        
     }
 
 
@@ -197,6 +200,9 @@ const CustomerReport = (props) => {
         });   
     }
 
+    const lastStep = () =>{
+        props.lastStep();
+    }
 
     return (
         <div>
@@ -342,8 +348,20 @@ const CustomerReport = (props) => {
                         editObj={customerDebt}
                         // eslint-disable-next-line react/no-string-refs
                         type="debts"/>
+                    {
+                       props.modalType == "look" ? 
+                       (<Button style={{
+                           marginLeft: 30,
+                       }}
+                            onClick={lastStep}
+                       >
+                           上一步
+                       </Button>)
+                   :
+                       ("")     
+                    }       
                     <Button style={{
-                        marginLeft: 8,
+                        marginLeft: 30,
                     }}
                         type="primary"
                         onClick={nextStep}

@@ -3,6 +3,7 @@ import { Modal, Button, Form, Input, Row, Col,  DatePicker,message,Select  } fro
 import request from '@/utils/request';
 import moment from 'moment';
 import EditableTable from './EditableTable';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 
 
@@ -118,15 +119,17 @@ const CompanyReport = (props) => {
     }
 
     const addreport = () =>{
-        try{
-            if(!form.getFieldValue('reportDate').format('YYYY-MM-DD') || form.getFieldValue('reportDate') == 'Invalid date'){
-                message.error('请选择正确的日期！！');
-                return;
-            }
-        }catch(e){
+        debugger;
+        console.log(11111);
+        if(!form.getFieldValue('reportDate') || form.getFieldValue('reportDate') == 'Invalid date'){
             message.error('请选择正确的日期！！');
+            return;
         }
-        
+        console.log(11111);
+        console.log(11111);
+        console.log(11111);
+        console.log(11111);
+        console.log(11111);
         request.post("/api/base/company-report/add",{
             data: { ...form.getFieldsValue,
                 reportDate: form.getFieldValue('reportDate').format('YYYY-MM-DD'),
@@ -149,6 +152,10 @@ const CompanyReport = (props) => {
                 message.error(res.data);
             }
         })
+            
+
+        
+        
     }
 
 
@@ -160,7 +167,6 @@ const CompanyReport = (props) => {
                   userId: localStorage.getItem('userId'),
                   customerId: form.getFieldValue('customerId'),
                   companyId: value,
-
                 },
                 headers:{
                   'Content-Type': 'application/json',
@@ -169,12 +175,24 @@ const CompanyReport = (props) => {
               }).then(res => {
                 if(res.code === '0000'){
                     let list = res.data;
-
                     list.map(v => {
                         v.key = v.id;
                     })
-
-                    setReportDateList(list);
+                    if(list.length == 0){
+                        Modal.confirm({
+                            title: '提示',
+                            content: '选中的企业还未添加企业信用报告。',
+                            onOk() {
+                                setReportDateList(list);
+                            },
+                            onCancel() {
+                                
+                            }
+                        }) 
+                    }else{
+                        setReportDateList(list);
+                    }
+                    
                 }
               })
 
@@ -208,9 +226,11 @@ const CompanyReport = (props) => {
                     
                 }
               })
-
         }
+    }
 
+    const lastStep = () =>{
+        props.lastStep();
     }
 
 
@@ -423,13 +443,25 @@ const CompanyReport = (props) => {
                         editObj={companyJudicatureInfos}
                         // eslint-disable-next-line react/no-string-refs
                         type="companyJudicatureInfo"/>
+                    {
+                       props.modalType == "look" ? 
+                       (<Button style={{
+                           marginLeft: 30,
+                       }}
+                        onClick={lastStep}
+                       >
+                           上一步
+                       </Button>)
+                   :
+                       ("")     
+                    }     
                     <Button style={{
-                        marginLeft: 8,
+                        marginLeft: 30,
                     }}
                         type="primary"
                         onClick={nextStep}
                     >
-                        完成
+                        结束查看
                         </Button>
                 </Form>
             </Modal>

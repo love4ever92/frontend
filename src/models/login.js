@@ -44,6 +44,7 @@ const Model = {
         localStorage.roleId = response.data.roleId;
         localStorage.mobilePhone = response.data.mobilePhone;
         localStorage.departmentId = response.data.depadepartmentId;
+        localStorage.department = response.data.department;
         history.replace(redirect || '/');
       }else{
         message.info(response.msg);

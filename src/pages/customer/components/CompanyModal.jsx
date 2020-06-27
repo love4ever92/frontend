@@ -412,14 +412,17 @@ const CompanyModal = (props) => {
     }
     
     const onChange = (value) =>{
-        const data = props.editObj[value.split(":")[0]];
+        const data = props.editObj.list[value.split(":")[0]];
         form.setFieldsValue({ ...data, 
             // companyId: `${props.editObj[0].id}:${props.editObj[0].name}`,
-            setTime: data.setTime?moment(props.editObj[0].setTime, 'YYYY-MM-DD'):null,
-            endTime: data.endTime?moment(props.editObj[0].endTime, 'YYYY-MM-DD'):null,
+            setTime: data.setTime?moment(data.setTime, 'YYYY-MM-DD'):null,
+            endTime: data.endTime?moment(data.endTime, 'YYYY-MM-DD'):null,
         });
     }
 
+    const lastStep = () =>{
+        props.lastStep();
+    }
 
     return (
         <div>
@@ -897,7 +900,19 @@ const CompanyModal = (props) => {
                             </Modal>
                         </Col>
                     </Row>
-                    <Row>    
+                    <Row> 
+                        {
+                            props.modalType == "look" ? 
+                                (<Button style={{
+                                    marginLeft: 30,
+                                }}
+                                    onClick={lastStep}
+                                >
+                                    上一步
+                                </Button>)
+                            :
+                                ("")
+                        }   
                         <Button style={{
                             marginLeft: 30,
                         }}
@@ -908,7 +923,7 @@ const CompanyModal = (props) => {
                         </Button>
                         <Button
                             style={{
-                                marginLeft: 8,
+                                marginLeft: 30,
                             }}
                             // eslint-disable-next-line react/jsx-no-bind
                             onClick={handleCancel}

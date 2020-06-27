@@ -550,7 +550,7 @@ const CustomerModal = (props) => {
                                 label="配偶姓名"
                             >
                                 <Input
-                                    placeholder={props.modalType != "look"  ? "请输入配偶姓名":""}
+                                    placeholder={props.modalType == "look" ||  form.getFieldValue('isMarried') != 2  ? "":"请输入配偶姓名"}
                                     disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
@@ -568,7 +568,7 @@ const CustomerModal = (props) => {
                                 ]}
                             >
                                 <Input
-                                    placeholder={props.modalType!="look"?"请输入配偶身份证号码":""}
+                                    placeholder={props.modalType == "look" ||  form.getFieldValue('isMarried') != 2  ? "":"请输入配偶身份证号码"}
                                     disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
@@ -588,7 +588,7 @@ const CustomerModal = (props) => {
                                     }
                                 ]}
                             >
-                                <Input  placeholder={props.modalType!="look"?"请输入客户配偶的手机号码":""}
+                                <Input  placeholder={props.modalType == "look" ||  form.getFieldValue('isMarried') != 2  ? "":"请输入客户配偶的手机号码"}
                                 disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
@@ -597,7 +597,7 @@ const CustomerModal = (props) => {
                                 name="mateCompany"
                                 label="配偶工作单位"
                             >
-                                <Input  placeholder={props.modalType!="look"?"请输入配偶工作单位":""} disabled={!mateInfoVisible} />
+                                <Input  placeholder={props.modalType == "look" ||  form.getFieldValue('isMarried') != 2  ? "":"请输入配偶工作单位"} disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
                     </Row>

@@ -68,11 +68,11 @@ export default class index extends Component {
           dataIndex: 'mobilePhone',
           key: 'mobilePhone',
         },
-        {
-          title: '公司名称',
-          dataIndex: 'companyName',
-          key: 'companyName',
-        },
+        // {
+        //   title: '公司名称',
+        //   dataIndex: 'companyName',
+        //   key: 'companyName',
+        // },
         {
           title: '所属部门',
           dataIndex: 'departmentName',
@@ -323,19 +323,42 @@ export default class index extends Component {
       }
     }).then(res => {
       if(res.code === '0000'){
+        
         const list = res.data;
         list.map(v => {
           v.key = v.id
           return v
         })
-        this.setState({
-          customerVisible: false,
-          companyVisible: true,
-          // companyObj: {...res.data, customerName, idNum, mobilePhone, customerId, }
-          companyObj: {list,customerName,customerId}, 
-          customerName,
-          customerId
-        })
+        if(list.length == 0){
+          let that = this;
+          Modal.confirm({
+          title: '提示',
+          content: '还未添加企业。',
+          onOk() {
+            this.setState({
+              customerVisible: false,
+              companyVisible: true,
+              // companyObj: {...res.data, customerName, idNum, mobilePhone, customerId, }
+              companyObj: {list,customerName,customerId}, 
+              customerName,
+              customerId
+            })
+          },
+          onCancel() {
+            
+          }
+        }) 
+        }else{
+          this.setState({
+            customerVisible: false,
+            companyVisible: true,
+            // companyObj: {...res.data, customerName, idNum, mobilePhone, customerId, }
+            companyObj: {list,customerName,customerId}, 
+            customerName,
+            customerId
+          })
+        }
+        
       }else{
         message.error(res.data? res.data : '获取公司信息失败，请联系系统运维人员');
       }
@@ -440,7 +463,7 @@ export default class index extends Component {
           onCancel() {
             
           }
-      }) 
+        }) 
         
       }else{
         message.info(res.data);
@@ -490,17 +513,42 @@ export default class index extends Component {
       }
     }).then(res => {
       if(res.code && res.code === '0000'){
-        this.setState({
-          customerReportVisible: false,
-          companyReportVisible: true,
-          companyReportObj:{
-            companyList: res.data, 
-            customerId,
-            customerName:name, 
-            companyName, 
-            companyId
+        if(res.data.constructor == Array && res.data.length == 0){
+          let that = this;
+        Modal.confirm({
+          title: '提示',
+          content: '还未添加企业。',
+          onOk() {
+            that.setState({
+              customerReportVisible: false,
+              companyReportVisible: true,
+              companyReportObj:{
+              companyList: res.data, 
+              customerId,
+              customerName:name, 
+              companyName, 
+              companyId
+              }
+            })
+          },
+          onCancel() {
+            
           }
-        })
+        }) 
+        }else{
+          this.setState({
+            customerReportVisible: false,
+            companyReportVisible: true,
+            companyReportObj:{
+              companyList: res.data, 
+              customerId,
+              customerName:name, 
+              companyName, 
+              companyId
+            }
+          })
+        }
+        
       }else if(res.code && res.code === '1111'){
         this.setState({
           customerReportVisible: false,
@@ -564,8 +612,29 @@ export default class index extends Component {
     }
   }
 
+  companyLastStep = () =>{
+    
+    this.setState({
+      companyVisible: false,
+      customerVisible: true,
+    })
+  }
 
+  customerReportLastStep = () =>{
+    
+    this.setState({
+      customerReportVisible: false,
+      companyVisible: true,
+    })
+  }
 
+  companyReportLastStep = () =>{
+
+    this.setState({
+      companyReportVisible: false,
+      customerReportVisible: true,
+    })
+  }
 
   render() {
     return (
@@ -599,6 +668,7 @@ export default class index extends Component {
           setVisible={this.changeCompany}
           editObj={this.state.companyObj}
           modalType={this.state.modalType}
+          lastStep={this.companyLastStep}
         />
         <CustomerReport
             customerId={this.state.customerId}
@@ -608,6 +678,7 @@ export default class index extends Component {
             setVisible={this.changeCustomerReport}
             editObj={this.state.customerReportObj}
             modalType={this.state.modalType}
+            lastStep={this.customerReportLastStep}
           />
         
         <CompanyReport
@@ -618,6 +689,7 @@ export default class index extends Component {
           setVisible={this.changeCompanyReport}
           editObj={this.state.companyReportObj}
           modalType={this.state.modalType}
+          lastStep={this.companyReportLastStep}
         />
 
       </div>
