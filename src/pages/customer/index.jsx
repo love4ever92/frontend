@@ -335,7 +335,7 @@ export default class index extends Component {
           title: '提示',
           content: '还未添加企业。',
           onOk() {
-            this.setState({
+            that.setState({
               customerVisible: false,
               companyVisible: true,
               // companyObj: {...res.data, customerName, idNum, mobilePhone, customerId, }

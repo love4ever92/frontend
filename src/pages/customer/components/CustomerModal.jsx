@@ -35,6 +35,10 @@ const CustomerModal = (props) => {
             getProvince();
             if(props.modalType == "add"){
                 form.resetFields();
+            }else if(props.modalType == "edit"){
+                if(props.editObj && props.editObj.isOrder == 1){
+                    setVisitDateDisable(false);
+                }
             }
         }
     }, [props.visible])
@@ -163,6 +167,24 @@ const CustomerModal = (props) => {
     }     
     
     const onFinish = () => {
+        if (!form.getFieldValue('birthdayPicker')) {
+            message.error('客户生日不能为空');
+            Modal.error({
+                title: '添加/编辑客户',
+                content: '客户生日不能为空，请选择客户生日',          
+            })
+            return;   
+        }
+        if(form.getFieldValue('isOrder') == 1){
+            if(!form.getFieldValue('visitDatePicker')){
+                message.error('如果预约了面谈，预约面谈日期不能为空');
+                Modal.error({
+                    title: '添加/编辑客户',
+                    content: '如果预约了面谈，预约面谈日期不能为空',          
+                })
+                return;
+            }
+        }
         if(isSubmit){
             try{
                 setIsSubmit(false);
@@ -474,7 +496,7 @@ const CustomerModal = (props) => {
                                 ]}
                             >
                                 <DatePicker
-                                    disabled ={props.modalType==='look'}
+                                    disabled={props.modalType==='edit' || props.modalType==='look'}
                                     onChange={handleBirthdayCHange} format='YYYY-MM-DD'
                                 />
                             </Form.Item>

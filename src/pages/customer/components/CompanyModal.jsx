@@ -320,10 +320,13 @@ const CompanyModal = (props) => {
     
     const timeTypeoOnChange = value => {
         form.setFieldsValue({ timeType : value });
-
+        console.log(111,value);
         if (value == 1) {
             setIsLongTime(false);
-        } else {
+        } else if ((value == 2)){
+            setIsLongTime(true);
+            form.setFieldsValue({ ...form.setFieldsValue, endTime : null });
+        }else{
             setIsLongTime(true);
         }
     }
@@ -847,7 +850,11 @@ const CompanyModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Select defaultValue={props.modalType=="look"?"":"0"} onChange={timeTypeoOnChange} disabled ={props.modalType==='look'}>
+                                <Select 
+                                    defaultValue={props.modalType=="look"?"":"0"} 
+                                    onChange={timeTypeoOnChange} 
+                                    disabled ={props.modalType==='look'}
+                                    >
                                     <Select.Option key="0" value="0" disabled >请选择</Select.Option>
                                     <Select.Option key="1" value={1}>固定期限</Select.Option>
                                     <Select.Option key="2" value={2}>长期</Select.Option>
@@ -860,7 +867,7 @@ const CompanyModal = (props) => {
                                 label="营业期限"
                             >
                                 <DatePicker
-                                    disabled = {props.modalType==='look' || isLongTime }
+                                    disabled = { props.modalType==='look' || isLongTime }
                                     format='YYYY-MM-DD'
                                 />
                             </Form.Item>
