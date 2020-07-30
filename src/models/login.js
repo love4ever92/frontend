@@ -37,13 +37,15 @@ const Model = {
             return;
           }
         }
-        
+        console.log(123,response.data);
         localStorage.token = response.data.token;
         localStorage.userName = response.data.userName;
         localStorage.userId = response.data.userId;
+        localStorage.jobId = response.data.jobId;
         localStorage.roleId = response.data.roleId;
         localStorage.mobilePhone = response.data.mobilePhone;
-        localStorage.departmentId = response.data.depadepartmentId;
+        localStorage.departmentId = response.data.departmentId;
+        localStorage.job = response.data.job;
         localStorage.department = response.data.department;
         history.replace(redirect || '/');
       }else{

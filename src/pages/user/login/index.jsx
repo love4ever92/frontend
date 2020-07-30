@@ -96,9 +96,9 @@ const Login = props => {
           />
         </Tab> */}
         <div>
-          <Checkbox checked={autoLogin} onChange={e => setAutoLogin(e.target.checked)}>
+          {/* <Checkbox checked={autoLogin} onChange={e => setAutoLogin(e.target.checked)}>
             自动登录
-          </Checkbox>
+          </Checkbox> */}
           <Button
             type='link'
             onClick={()=>{ window.location.href = '/user/register'; }}

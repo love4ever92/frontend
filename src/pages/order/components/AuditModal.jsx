@@ -5,7 +5,8 @@ import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form, Input, Row, Col, DatePicker, Divider, Select, message } from 'antd'
 import moment from 'moment'
 import request from '@/utils/request';
-
+import CustomerModal  from './CustomerModal'
+import CompanyModal  from './CompanyModal'
 
 const EditModal = (props) => {
 
@@ -13,6 +14,12 @@ const EditModal = (props) => {
     const [form] = Form.useForm();
     const [maskClosable,] = useState(false);
     const [isSubmit, setIsSubmit] = useState(true);
+    const [customerVisible, setCustomerVisible] = useState(false);
+    const [companyVisible, setCompanyVisible] = useState(false);
+    const [customerObj, setCustomerObj] = useState({});
+    const [companyObj, setCompanyObj] = useState({});
+    const [customerButton, setCustomerButton] = useState(false);
+    const [companyButton, setCompanyButton] = useState(false);
 
 
 
@@ -52,8 +59,8 @@ const EditModal = (props) => {
                 document.getElementById("teller").style.display="block";
             }else if(props.type == 'financeManager'){
                 document.getElementById("financeManager").style.display="block";
-            }else if(props.type == 'countersign'){
-                document.getElementById("confirmCountersign").style.display="block";
+            }else if(props.type == 'productDirector'){
+                document.getElementById("productDirector").style.display="block";
             }
             
 
@@ -76,11 +83,11 @@ const EditModal = (props) => {
 
     
      /**
-     * 业务会签确认
+     * 业务负责人确认
      * @param {} params 
      */
-    const confirmCountersign = (params) =>{
-        request.get('/api/base/order/confirmCountersign', {
+    const productDirector = (params) =>{
+        request.get('/api/base/order/productDirector', {
             params,
             headers: {
                 'Content-Type': 'application/json',
@@ -88,12 +95,17 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('确认提交成功');
-                timeOut(20000);
+                Modal.success({
+                    title: '业务负责人确认订单成功',
+                })
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
                 message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+                Modal.error({
+                    title: '产品经理确认订单失败',
+                    content: "失败原因： " +  res.data ? res.data:"确认提交失败，原因不明，请联系维护人员",
+                })
             }
         })
     }
@@ -112,12 +124,17 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('确认提交成功');
-                timeOut(20000);
+                Modal.success({
+                    title: '财务经理确认订单成功',
+                })
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
                 message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+                Modal.error({
+                    title: '财务经理确认订单失败',
+                    content: "失败原因： " +  res.data ? res.data:"确认提交失败，原因不明，请联系维护人员",
+                })
             }
         })
     }
@@ -136,12 +153,17 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('确认提交成功');
-                timeOut(20000);
+                Modal.success({
+                    title: '出纳确认订单成功',
+                })
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
                 message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+                Modal.error({
+                    title: '出纳确认订单失败',
+                    content: "失败原因： " +  res.data ? res.data:"确认提交失败，原因不明，请联系维护人员",
+                })
             }
         })
     }
@@ -159,18 +181,23 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('确认提交成功');
-                timeOut(20000);
+                Modal.success({
+                    title: '会计确认订单成功',
+                })
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
                 message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+                Modal.error({
+                    title: '会计确认订单失败',
+                    content: "失败原因： " +  res.data ? res.data:"确认提交失败，原因不明，请联系维护人员",
+                })
             }
         })
     }
 
     /**
-     * 业务负责人确认
+     * 财务确认
      * @param {} params 
      */
     const confirm = (params) =>{
@@ -182,12 +209,17 @@ const EditModal = (props) => {
             },
         }).then(res => {
             if (res.code && res.code === '0000') {
-                message.info('确认提交成功');
-                timeOut(20000);
+                Modal.success({
+                    title: '财务确认单成功',
+                })
                 props.setVisible(false);
             }else{
                 setIsSubmit(true);
                 message.error(res.data ? res.data : "确认提交失败，原因不明，请联系维护人员");
+                Modal.error({
+                    title: '财务确认订单失败',
+                    content: "失败原因： " +  res.data ? res.data:"确认提交失败，原因不明，请联系维护人员",
+                })
             }
         })
     }
@@ -207,7 +239,7 @@ const EditModal = (props) => {
                 if(form.getFieldValue('confirmOpinion')=="不同意"){
                     if(form.getFieldValue('confirmReason')){
                         Modal.confirm({
-                            title: '业务负责人确认订单',
+                            title: '财务确认订单',
                             content: '确认提交确认！',
                             onOk () {
                                 confirm(params);
@@ -221,7 +253,7 @@ const EditModal = (props) => {
                     }
                 }else{
                     Modal.confirm({
-                        title: '业务负责人确认订单',
+                        title: '财务确认订单',
                         content: '确认提交确认！',
                         onOk () {
                             confirm(params);
@@ -332,22 +364,22 @@ const EditModal = (props) => {
                     })
                 }
                 setIsSubmit(true);
-            }else if(props.type == "countersign"){
-                // 业务会签确认
+            }else if(props.type == "productDirector"){
+                // 业务负责人确认
                 const params={
                     orderId: form.getFieldValue('key'),
                     userId: localStorage.getItem('userId'),
-                    confirmCountersignOpinion: form.getFieldValue('confirmCountersignOpinion'),
-                    confirmCountersignStaff: form.getFieldValue('confirmCountersignStaff'),
-                    confirmCountersignReason: form.getFieldValue('confirmCountersignReason'),
+                    productDirectorOpinion: form.getFieldValue('productDirectorOpinion'),
+                    productDirectorStaff: form.getFieldValue('productDirectorStaff'),
+                    productDirectorReason: form.getFieldValue('productDirectorReason'),
                 }
-                if(form.getFieldValue('confirmCountersignOpinion')=="不同意"){
-                    if(form.getFieldValue('confirmCountersignReason')){
+                if(form.getFieldValue('productDirectorOpinion')=="不同意"){
+                    if(form.getFieldValue('productDirectorReason')){
                         Modal.confirm({
                             title: '业务负责人会签订单',
                             content: '确认提交确认！',
                             onOk () {
-                                confirmCountersign(params);
+                                productDirector(params);
                                 setIsSubmit(true);
                             }
                         })
@@ -357,10 +389,10 @@ const EditModal = (props) => {
                     }
                 }else{
                     Modal.confirm({
-                        title: '业务负责人会签订单',
+                        title: '业务负责人确认订单',
                         content: '确认提交确认！',
                         onOk () {
-                            confirmCountersign(params);
+                            productDirector(params);
                             setIsSubmit(true);
                         }
                     })
@@ -372,42 +404,95 @@ const EditModal = (props) => {
         }
     }
 
-    const countersign = () => {
-        // 业务负责人发起会签
-        let confirmCountersignStaffPlan
-        if(localStorage.getItem("userName") === "孙克辉"){
-            confirmCountersignStaffPlan = "吴剑萍"
-        }else{
-            confirmCountersignStaffPlan = "孙克辉" 
-        }
-        const params={
-            orderId: form.getFieldValue('key'),
-            confirmCountersignStaffPlan: confirmCountersignStaffPlan,
-            userId: localStorage.getItem('userId'),
-        }
-        Modal.confirm({
-            title: '发起订单会签',
-            content: `是否邀请${confirmCountersignStaffPlan}会签？`,
-            onOk () {
-                request.get('/api/base/order/countersign', {
-                    params,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                }).then(res => {
-                    if (res.code && res.code === '0000') {
-                        message.info('确认提交成功');
-                        timeOut(20000);
-                        props.setVisible(false);
-                    }else{
-                        setIsSubmit(true);
-                        message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
-                    }
-                })
-                setIsSubmit(true);
-            }     
+    // const productDirector = () => {
+    //     // 业务负责人发起会签
+    //     let productDirectorStaffPlan
+    //     if(localStorage.getItem("userName") === "孙克辉"){
+    //         productDirectorStaffPlan = "吴剑萍"
+    //     }else{
+    //         productDirectorStaffPlan = "孙克辉" 
+    //     }
+    //     const params={
+    //         orderId: form.getFieldValue('key'),
+    //         productDirectorStaffPlan: productDirectorStaffPlan,
+    //         userId: localStorage.getItem('userId'),
+    //     }
+    //     Modal.confirm({
+    //         title: '发起订单会签',
+    //         content: `是否邀请${productDirectorStaffPlan}会签？`,
+    //         onOk () {
+    //             request.get('/api/base/order/productDirector', {
+    //                 params,
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'Accept': 'application/json',
+    //                 },
+    //             }).then(res => {
+    //                 if (res.code && res.code === '0000') {
+    //                     message.info('确认提交成功');
+    //                     timeOut(20000);
+    //                     props.setVisible(false);
+    //                 }else{
+    //                     setIsSubmit(true);
+    //                     message.error(res.data ? res.data:"确认提交失败，原因不明，请联系维护人员");
+    //                 }
+    //             })
+    //             setIsSubmit(true);
+    //         }     
+    //     })
+    // }
+    function getCustomer() {
+        console.log("aa",form.getFieldValue("customerId"));
+        request.get("/api/base/customer/getOne", {
+            params: { id: form.getFieldValue("customerId").toString().split(":")[0], userId: localStorage.getItem('userId') },
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          }).then(res => {
+            if (res.code === '0000') {
+              setCustomerObj(res.data);
+              setCustomerVisible(true);
+            } else {
+              Modal.confirm({
+                title: '获取客户失败',
+                content: `失败原因： ${res.data}`,
+                onOk() { },
+              })
+            }
+          })
+        
+
+    }
+
+     function getCompany() {
+        request.get("/api/base/company/getOne", {
+            params: { id: form.getFieldValue("companyId").toString().split(":")[0], userId: localStorage.getItem('userId') },
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          }).then(res => {
+            if (res.code === '0000') {
+              setCompanyObj(res.data);
+              setCompanyVisible(true);
+            } else {
+              Modal.confirm({
+                title: '获取企业失败',
+                content: `失败原因： ${res.data}`,
+                onOk() { },
+              })
+            }
         })
+    }
+
+    function setVisible4CustomerModal(){
+        
+        setCustomerVisible(false);
+        
+    }
+    function setVisible4CompanyModal(){
+        setCompanyVisible(false);
     }
 
     function onChange(value) {
@@ -426,6 +511,27 @@ const EditModal = (props) => {
         console.log('search:', val);
     }
 
+
+    const layoutcol_6 = {
+
+        md: {
+            span: 6
+        },
+        xs: {
+            span: 12
+        }
+    }
+
+    const layoutcol_12 = {
+
+        md: {
+            span: 12
+        },
+        xs: {
+            span: 24
+        }
+    }
+
     return (
         <div>
             <Modal
@@ -436,7 +542,7 @@ const EditModal = (props) => {
                 maskClosable={maskClosable}
                 destroyOnClose
                 getContainer={false}
-                width={800}
+                width={1000}
                 footer={
                     [] // 设置footer为空，去掉 取消 确定默认按钮
                 }
@@ -446,7 +552,7 @@ const EditModal = (props) => {
                     onFinish={onFinish}
                 >
                     <Row gutter={24}>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="key"
                                 label="编号"
@@ -454,7 +560,7 @@ const EditModal = (props) => {
                                 <Input  disabled />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="createUserName"
                                 label="填表人"
@@ -462,7 +568,7 @@ const EditModal = (props) => {
                                 <Input defaultValue={localStorage.getItem('userName')} disabled />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 format='YYYY-MM-DD'
                                 name="operatTime"
@@ -471,14 +577,13 @@ const EditModal = (props) => {
                                 <DatePicker disabled/>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="departmentId"
                                 label="部门"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -498,7 +603,7 @@ const EditModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                    <Col span={6}>
+                    <Col {...layoutcol_6}>
                             <Form.Item
                                 name="customerId"
                                 label="客户"
@@ -511,7 +616,6 @@ const EditModal = (props) => {
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -529,14 +633,13 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="serviceStaffId"
                                 label="主办人"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -554,14 +657,13 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="helpStaffId"
                                 label="辅助人"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -579,14 +681,13 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="phoneStaffId"
                                 label="电销"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -606,14 +707,13 @@ const EditModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={12} >
+                        <Col {...layoutcol_12} >
                             <Form.Item
                                 name="companyId"
                                 label="贷款企业"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -631,14 +731,13 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12} >
+                        <Col {...layoutcol_12} >
                             <Form.Item
                                 name="bankName"
                                 label="下款银行"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -658,7 +757,7 @@ const EditModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={8} >
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="loan"
                                 label="下款金额(￥)"
@@ -666,7 +765,7 @@ const EditModal = (props) => {
                                 <Input disabled />
                             </Form.Item>
                         </Col>
-                        <Col span={8} >
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="serviceRate"
                                 label="小款点位(%)"
@@ -674,7 +773,7 @@ const EditModal = (props) => {
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
-                        <Col span={8} >
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="serviceMoney"
                                 label="小款金额(￥)"
@@ -682,16 +781,13 @@ const EditModal = (props) => {
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={8} >
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="isGet"
                                 label="收款情况"
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -709,7 +805,10 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={8} >
+                    </Row>
+                    <Row gutter={24}>
+                        
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="otherCost"
                                 label="其他费用(￥)"
@@ -717,7 +816,7 @@ const EditModal = (props) => {
                                 <Input disabled/>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="getMoney"
                                 label="已收金额(￥)"
@@ -725,22 +824,13 @@ const EditModal = (props) => {
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={8} >
+                        <Col {...layoutcol_6} >
                             <Form.Item
                                 name="needInvoice"
                                 label="是否开票"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请选择',
-                                    },
-                                ]}
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -757,18 +847,18 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={16}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="remark"
                                 label="备注"
                             >
-                                <Input placeholder="备注" disabled />
+                                <Input  disabled />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="createUserName2"
                                 label="填表人"
@@ -777,37 +867,57 @@ const EditModal = (props) => {
                                 <Input  disabled/>
                             </Form.Item>
                         </Col>
+                        <Col {...layoutcol_6}>
+                            <Button
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={getCustomer}
+                            >
+                                查看客户
+                            </Button>
+                            <Button
+                                style={{
+                                    marginLeft: 8,
+                                }}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={getCompany}
+                            >
+                                查看企业
+                            </Button>
+                        </Col>
                     </Row>
                     <Divider  />
                     <Row gutter={24}  >
-                        <Col span={6}>
+                        <Col  {...layoutcol_6}>
                             <Form.Item
-                                name="confirmCountersignStaff"
-                                label="业务会签"
+                                name="productDirectorStaff"
+                                label="业务负责人确认"
                                 rules={[
                                     {
-                                        required: props.type==="countersign",
-                                        message: '业务会签签名',
+                                        required: props.type==="productDirector",
+                                        message: '签名',
                                     },
                                 ]}
                             >
-                                <Input placeholder="签名"  disabled={ props.type!=="countersign" } />
+                                <Input   placeholder={props.type==="productDirector"? "签名":""}     disabled={ props.type!=="productDirector" } />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
-                                name="confirmCountersignOpinion"
-                                label="会签结果"
+                                name="productDirectorOpinion"
+                                label="确认结果"
                                 rules={[
                                     {
-                                        required: props.type==="countersign",
+                                        required: props.type==="productDirector",
                                         message: '请选择',
                                     },
                                 ]}
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
+                                    placeholder={props.type==="productDirector"? "请选择":""} 
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -816,7 +926,7 @@ const EditModal = (props) => {
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
-                                    disabled={ props.type!=="countersign" }
+                                    disabled={ props.type!=="productDirector" }
                                 >
                                     <Select.Option disabled key={0} value="0">请选择</Select.Option>
                                     <Select.Option key={1} value="同意">同意</Select.Option>
@@ -824,18 +934,18 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12} >
+                        <Col  {...layoutcol_12} >
                             <Form.Item
-                                name="confirmCountersignReason"
+                                name="productDirectorReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见" 
-                                    disabled={ props.type!=="countersign" } />
+                                <Input placeholder={props.type==="productDirector"? "处理意见":""} 
+                                    disabled={ props.type!=="productDirector" } />
                             </Form.Item>
                         </Col>
                     </Row>
-                    <Row gutter={24}  style={ { display:"none" }  } id = 'confirmCountersign' >
-                        <Col span={8}>
+                    <Row gutter={24}  style={ { display:"none" }  } id = 'productDirector' >
+                        <Col  {...layoutcol_12}>
                             <Button  
                                 style={{
                                 marginLeft: 8,
@@ -855,24 +965,26 @@ const EditModal = (props) => {
                                 取消
                             </Button>
                         </Col>
+                        
                     </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="confirmStaff"
-                                label="业务负责人"
+                                label="财务确认"
                                 rules={[
                                     {
                                         required: props.type==="confirm",
-                                        message: '业务负责人签名',
+                                        message: '财务签名',
                                     },
                                 ]}
                             >
-                                <Input placeholder="签名"  disabled={props.type!=="confirm" } />
+                                <Input placeholder={props.type==="confirm"? "签名":""} 
+                                     disabled={props.type!=="confirm" } />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="confirmOpinion"
                                 label="确认结果"
@@ -885,7 +997,7 @@ const EditModal = (props) => {
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
+                                    placeholder={props.type==="confirm"? "请选择":""}
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -901,29 +1013,18 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="confirmReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见" disabled={props.type!=="confirm" } />
+                                <Input placeholder={props.type==="confirm"? "处理意见":""} disabled={props.type!=="confirm" } />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={24} style={ { display:"none" }  } id = 'confirm' >
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Button 
-                                onClick={countersign}
-                                style={{
-                                marginLeft: 8,
-                            }}
-                                type="primary"
-                                disabled = { form.getFieldValue('confirmCountersignOpinion') == "同意"}
-                            >
-                                会签
-                            </Button>
-                            <Button 
-                                
                                 style={{
                                 marginLeft: 8,
                             }}
@@ -944,8 +1045,8 @@ const EditModal = (props) => {
                         </Col>
                     </Row>
                     <Divider />
-                    <Row gutter={24}>
-                        <Col span={6}>
+                    {/* <Row gutter={24}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="financeStaff"
                                 label="会计确认"
@@ -956,10 +1057,10 @@ const EditModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input  placeholder="签名" disabled={ props.type!=="finance" } />
+                                <Input  placeholder={props.type==="finance"? "签名":""} disabled={ props.type!=="finance" } />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="financeOpinion"
                                 label="确认结果"
@@ -973,7 +1074,7 @@ const EditModal = (props) => {
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
+                                    placeholder={props.type==="finance"? "请选择":""}
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -989,12 +1090,12 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="financeReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见"  disabled={ props.type!=="finance" }/>
+                                <Input placeholder={props.type==="finance"? "处理意见":""}  disabled={ props.type!=="finance" }/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1022,7 +1123,7 @@ const EditModal = (props) => {
                     </Row>
                     <Divider />
                     <Row gutter={24} >
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="tellerStaff"
                                 label="出纳确认"
@@ -1033,10 +1134,10 @@ const EditModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input  placeholder="签名" disabled={ props.type!=="teller"  } />
+                                <Input  placeholder={props.type==="teller"? "签名":""} disabled={ props.type!=="teller"  } />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="tellerOpinion"
                                 label="确认结果"
@@ -1050,7 +1151,7 @@ const EditModal = (props) => {
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
+                                    placeholder={props.type==="teller"? "请选择":""} 
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -1066,12 +1167,12 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="tellerReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见"  disabled={props.type !== "teller" }/>
+                                <Input placeholder={props.type==="teller"? "处理意见" :""}  disabled={props.type !== "teller" }/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1100,7 +1201,7 @@ const EditModal = (props) => {
                     </Row>
                     <Divider />
                     <Row gutter={24}>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="financeManagerStaff"
                                 label="财务经理确认"
@@ -1111,10 +1212,10 @@ const EditModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input  placeholder="签名" disabled={ props.type!=="financeManager" } />
+                                <Input  placeholder={props.type==="financeManager"? "签名" :""} disabled={ props.type!=="financeManager" } />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="financeManagerOpinion"
                                 label="确认结果"
@@ -1128,7 +1229,7 @@ const EditModal = (props) => {
                             >
                                 <Select
                                     showSearch
-                                    placeholder="请选择"
+                                    placeholder={props.type==="financeManager"? "请选择" :""}
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onFocus={onFocus}
@@ -1145,12 +1246,12 @@ const EditModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="financeManagerReason"
                                 label="处理意见"
                             >
-                                <Input placeholder="处理意见"  disabled={props.type !== "financeManager" }/>
+                                <Input placeholder={props.type==="financeManager"? "处理意见" :""}  disabled={props.type !== "financeManager" }/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1175,9 +1276,25 @@ const EditModal = (props) => {
                                 取消
                             </Button>
                         </Col>
-                    </Row>
+                    </Row> */}
                 </Form>
             </Modal>
+            <CustomerModal
+                title= "客户资料"       
+                visible={customerVisible}
+                setVisible={setVisible4CustomerModal}
+                editObj={customerObj}
+                modalType="look"
+            />
+            
+            <CompanyModal
+                title='企业资料'
+                visible={companyVisible}
+                setVisible={setVisible4CompanyModal}
+                modalType="look"
+                editObj={companyObj}
+                // eslint-disable-next-line react/jsx-no-bind
+            />
         </div>
     );
 }

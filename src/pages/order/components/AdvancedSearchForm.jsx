@@ -52,6 +52,31 @@ const AdvancedSearchForm = (props) => {
     console.log('search:', val);
   }
 
+  const layoutcol_4 = {
+
+    md: {
+        span: 4
+    },
+    sm: {
+      span: 8
+    },
+    xs: {
+        span: 12
+    }
+}
+const layoutcol_6 = {
+
+  md: {
+      span: 6
+  },
+  sm: {
+    span: 12
+  },
+  xs: {
+      span: 24
+  }
+}
+
   return (
     <>
       <h1>{props.title}</h1>
@@ -62,7 +87,7 @@ const AdvancedSearchForm = (props) => {
           onFinish={onFinish}
         >
           <Row gutter={24}>
-            <Col span={5} >
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="departmentId"
                 label="部门"
@@ -86,7 +111,7 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={5} >
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="serviceStaffId"
                 label="主办"
@@ -110,7 +135,7 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={5} >
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="helpStaffId"
                 label="辅助"
@@ -134,7 +159,7 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={5} >
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="phoneStaffId"
                 label="电销"
@@ -158,13 +183,10 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            
-          </Row>
-          <Row gutter={24}>
-            <Col span={6} >
+            <Col {...layoutcol_6} >
               <Form.Item
                 name="companyId"
-                label="公司"
+                label="企业"
               >
                 <Select
                   showSearch
@@ -185,31 +207,11 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6} >
-              <Form.Item
-                name="bankName"
-                label="银行"
-              >
-                <Select
-                  showSearch
-                  placeholder="请选择"
-                  optionFilterProp="children"
-                  onChange={onChange}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                  onSearch={onSearch}
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  <Select.Option key='0' value='0'>请选择</Select.Option>
-                  {props.bankOptions.map(v => {
-                    return (<Select.Option key={v.id} value={v.name}>{v.name}</Select.Option>);
-                  })}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={4}>
+            
+          </Row>
+          <Row gutter={24}>
+            
+            <Col {...layoutcol_4}>
               <Form.Item
                 name="startMoney"
                 label="下款大于"
@@ -217,7 +219,7 @@ const AdvancedSearchForm = (props) => {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col {...layoutcol_4}>
               <Form.Item
                 name="endMoney"
                 label="下款小于"
@@ -225,18 +227,16 @@ const AdvancedSearchForm = (props) => {
                 <Input />
               </Form.Item>
             </Col>
-            
-          </Row>
-          <Row gutter={24}>
-            <Col span={4}>
-                <Form.Item
-                  name="serviceRate"
-                  label="下款点位"
-                >
-                  <Input suffix="%" />
-                </Form.Item>
-              </Col>
-              <Col span={6} >
+
+            <Col {...layoutcol_4}>
+              <Form.Item
+                name="serviceRate"
+                label="下款点位"
+              >
+                <Input suffix="%" />
+              </Form.Item>
+            </Col>
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="isGet"
                 label="小款是否已收"
@@ -260,7 +260,62 @@ const AdvancedSearchForm = (props) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6} >
+            <Col {...layoutcol_6} >
+              <Form.Item
+                name="bankName"
+                label="银行"
+              >
+                <Select
+                  showSearch
+                  placeholder="请选择"
+                  optionFilterProp="children"
+                  onChange={onChange}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  onSearch={onSearch}
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  <Select.Option key='0' value='0'>请选择</Select.Option>
+                  {props.bankOptions.map(v => {
+                    return (<Select.Option key={v.id} value={v.name}>{v.name}</Select.Option>);
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={24}>
+            <Col {...layoutcol_6}>
+              <Form.Item
+                name="createTimeRange"
+                label="开单时间"
+              >
+                <DatePicker.RangePicker
+                  format='YYYY-MM-DD'
+                  ranges={{
+                    Today: [moment(), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col {...layoutcol_6}>
+              <Form.Item
+                name="operatTimeRange"
+                label="操作时间"
+              >
+                <DatePicker.RangePicker
+                  format='YYYY-MM-DD'
+                  ranges={{
+                    Today: [moment(), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col {...layoutcol_4} >
               <Form.Item
                 name="status"
                 label="状态"
@@ -279,68 +334,14 @@ const AdvancedSearchForm = (props) => {
                 >
                   <Select.Option key={0} value={0}>请选择</Select.Option>
                   <Select.Option key={1} value={1}>初始状态</Select.Option>
-                  <Select.Option key={2} value={2}>待业务负责人确认</Select.Option>
-                  <Select.Option key={3} value={3}>待财务负责人确认</Select.Option>
-                  <Select.Option key={5} value={5}>财务负责人确认</Select.Option>
-                  <Select.Option key={6} value={6}>已做工资结算,流程结束</Select.Option>
+                  <Select.Option key={2} value={9}>待产品总监确认</Select.Option>
+                  <Select.Option key={2} value={2}>待总经理确认</Select.Option>
+                  <Select.Option key={3} value={3}>待会计确认</Select.Option>
+                  <Select.Option key={3} value={5}>待出纳确认</Select.Option>
+                  <Select.Option key={3} value={6}>待财务经理确认</Select.Option>
+                  <Select.Option key={5} value={7}>财务经理已确认</Select.Option>
+                  {/* <Select.Option key={6} value={8}>订单已结算</Select.Option> */}
                 </Select>
-              </Form.Item>
-            </Col>
-            <Col span={5} >
-              <Form.Item
-                name="confirmOpinion"
-                label="业务确认"
-              >
-                <Select defaultValue="0"  >
-                <Select.Option key={0} value="0" >请选择</Select.Option>
-                  <Select.Option key={1} value="同意">同意</Select.Option>
-                  <Select.Option key={2} value="不同意">不同意</Select.Option>
-                  <Select.Option key={3} value="待确认">待确认</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={24}>
-            
-            <Col span={5} >
-              <Form.Item
-                name="financeOpinion"
-                label="财务确认"
-              >
-                <Select defaultValue="0"  >
-                  <Select.Option key={0} value="0" >请选择</Select.Option>
-                  <Select.Option key={1} value="同意">同意</Select.Option>
-                  <Select.Option key={2} value="不同意">不同意</Select.Option>
-                  <Select.Option key={3} value="待确认">待确认</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={7}>
-              <Form.Item
-                name="createTimeRange"
-                label="开单时间"
-              >
-                <DatePicker.RangePicker
-                  format='YYYY-MM-DD'
-                  ranges={{
-                    Today: [moment(), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={7}>
-              <Form.Item
-                name="operatTimeRange"
-                label="操作时间"
-              >
-                <DatePicker.RangePicker
-                  format='YYYY-MM-DD'
-                  ranges={{
-                    Today: [moment(), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                  }}
-                />
               </Form.Item>
             </Col>
           </Row>
@@ -351,7 +352,10 @@ const AdvancedSearchForm = (props) => {
                 textAlign: 'right',
               }}
             >
-              <Button type="primary" onClick={showAdd} disabled = {localStorage.getItem('roleId') == 4}>
+              <Button 
+                type="primary" 
+                onClick={showAdd} 
+                disabled={localStorage.getItem('roleId') == 4 || localStorage.getItem('roleId') == 5 || localStorage.getItem('roleId') == 6  } >
                 创建订单
           </Button>
               <Button style={{
@@ -383,7 +387,7 @@ const AdvancedSearchForm = (props) => {
             companyOptions={props.companyOptions}
             bankOptions={props.bankOptions}
             customerOptions={props.customerOptions}
-            destroyOnClose={1==1}
+            destroyOnClose={1 == 1}
           />
         </Form>
       </div>

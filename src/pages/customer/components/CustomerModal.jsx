@@ -373,6 +373,25 @@ const CustomerModal = (props) => {
         });
     }
 
+    const layoutcol_6 = {
+
+        md: {
+            span: 6
+        },
+        xs: {
+            span: 12
+        }
+    }
+
+    const layoutcol_12 = {
+
+        md: {
+            span: 12
+        },
+        xs: {
+            span: 24
+        }
+    }
 
     return (
         <div>
@@ -386,7 +405,7 @@ const CustomerModal = (props) => {
                 maskClosable={maskClosable}
                 getContainer={false}
                 destroyOnClose
-                width="800px"
+                width="1000px"
                 footer={
                     [] // 设置footer为空，去掉 取消 确定默认按钮
                 }
@@ -398,7 +417,7 @@ const CustomerModal = (props) => {
                     onFinish={onFinish}
                 >
                     <Row gutter={24}>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="id"
                                 label="编号"
@@ -406,7 +425,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="" disabled />
                             </Form.Item>
                         </Col>
-                        <Col span={7}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="customerName"
                                 label="客户姓名"
@@ -423,7 +442,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="客户姓名" disabled={props.modalType==='edit' || props.modalType==='look'} />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="mobilePhone"
                                 label="手机号码"
@@ -440,7 +459,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="请输入客户手机号码" disabled={props.modalType==='edit' || props.modalType==='look'} />
                             </Form.Item>
                         </Col>
-                        <Col span={5}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="gender"
                                 label="性别"
@@ -464,7 +483,7 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="idNum"
                                 label="身份证"
@@ -484,7 +503,7 @@ const CustomerModal = (props) => {
                                 <Input placeholder="请输入客户身份证号码" disabled={props.modalType==='edit' || props.modalType==='look'} />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="birthdayPicker"
                                 label="生日"
@@ -501,7 +520,7 @@ const CustomerModal = (props) => {
                                 />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="education"
                                 label="学历"
@@ -525,25 +544,25 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="bankName"
                                 label="银行名称"
                             >
-                                <Input placeholder="请输入银行名称" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType==='look'?"":"请输入银行名称"} disabled = {props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="bankCardNum"
                                 label="银行卡号码"
                             >
-                                <Input placeholder="请输入银行卡号码" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType==='look'?"":"请输入银行卡号码"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={6}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="isMarried"
                                 label="婚姻状况"
@@ -566,7 +585,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={7}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="mateName"
                                 label="配偶姓名"
@@ -576,7 +595,7 @@ const CustomerModal = (props) => {
                                     disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
-                        <Col span={11}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="mateIdNum"
                                 label="配偶身份证号码"
@@ -596,7 +615,7 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="mateMobilePhone"
                                 label="客户配偶的手机号码"
@@ -614,7 +633,7 @@ const CustomerModal = (props) => {
                                 disabled={!mateInfoVisible} />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col {...layoutcol_12}>
                             <Form.Item
                                 name="mateCompany"
                                 label="配偶工作单位"
@@ -624,16 +643,10 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={3}>
-                            <Form.Item
-                                name="ccc "
-                                label="通讯地址"
-                            />
-                        </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="msgProvince"
-                                label=""
+                                label="通讯地址"
                                 
                             >
                                 <Select
@@ -655,7 +668,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="msgCity"
                                 label=""
@@ -680,7 +693,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="msgArea"
                                 label=""
@@ -703,7 +716,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={9}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="msgAddress"
                                 label=""
@@ -714,16 +727,10 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={3}>
-                            <Form.Item
-                                name="cc"
-                                label="户籍地址"
-                            />
-                        </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="idProvince"
-                                label=""
+                                label="户籍地址"
                             >
                                 <Select
                                     showSearch
@@ -744,7 +751,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="idCity"
                                 label=""
@@ -768,7 +775,7 @@ const CustomerModal = (props) => {
                                 </Select>                               
                             </Form.Item>
                         </Col>
-                        <Col span={4}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="idArea"
                                 label=""
@@ -791,7 +798,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={9}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="idAddress"
                                 label=""
@@ -801,7 +808,7 @@ const CustomerModal = (props) => {
                         </Col>
                     </Row>
                     <Row gutter={24}>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="isOrder"
                                 label="是否预约面谈"
@@ -822,7 +829,7 @@ const CustomerModal = (props) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="visitDatePicker"
                                 label="预约面谈日期"
@@ -837,7 +844,7 @@ const CustomerModal = (props) => {
                                     format='YYYY-MM-DD' disabled={ visitDateDisable||props.modalType==='look' } />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="visitTimes"
                                 label="已拜访次数"
@@ -845,14 +852,12 @@ const CustomerModal = (props) => {
                                 <Input placeholder='拜访次数' disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24}>
+                        <Col {...layoutcol_6}>
                             <Form.Item
                                 name="remark"
                                 label="备注"
                             >
-                                <Input placeholder="请输入备注" disabled ={props.modalType==='look'}/>
+                                <Input placeholder={props.modalType==='look'?"":"请输入备注"} disabled ={props.modalType==='look'}/>
                             </Form.Item>
                         </Col>
                     </Row>

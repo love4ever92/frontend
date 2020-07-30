@@ -5,10 +5,12 @@ import AdvancedSearchForm from './components/AdvancedSearchForm';
 import EditModal from './components/EditModal'
 import LookModal from './components/LookModal'
 import AuditModal from './components/AuditModal'
+import ProTable from '@ant-design/pro-table';
 
 
-
-
+/**
+ * 订单流程：填表人-业务负责人-财务
+ */
 
 // eslint-disable-next-line react/prefer-stateless-function
 export default class index extends Component {
@@ -69,15 +71,30 @@ export default class index extends Component {
           key: 'otherCost',
         },
         {
-          title: '业务确认结果',
-          dataIndex: 'confirmOpinion',
-          key: 'confirmOpinion',
+          title: '业务负责人确认结果',
+          dataIndex: 'productDirectorOpinion',
+          key: 'productDirectorpinion',
         },
         {
           title: '财务确认结果',
-          dataIndex: 'financeOpinion',
-          key: 'financeOpinion',
+          dataIndex: 'confirmOpinion',
+          key: 'confirmOpinion',
         },
+        // {
+        //   title: '会计确认结果',
+        //   dataIndex: 'financeOpinion',
+        //   key: 'financeOpinion',
+        // },
+        // {
+        //   title: '出纳确认结果',
+        //   dataIndex: 'tellerOpinion',
+        //   key: 'tellerOpinion',
+        // },
+        // {
+        //   title: '财务经理确认结果',
+        //   dataIndex: 'financeManagerOpinion',
+        //   key: 'financeManagerOpinion',
+        // },
         {
           title: '操作时间',
           dataIndex: 'operatTime',
@@ -94,51 +111,36 @@ export default class index extends Component {
           render: (text, record) => (
             <span>
               <Button type='link' onClick={() => this.openLook(text, record)}>查看</Button>
-              <Button 
+              {/* <Button 
                style={ auth === "管理员" ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
                type='link' onClick={() => this.getFirsh(text, record)}>
                  初始化
-                 </Button>
+                 </Button> */}
               <Button  type='link' 
                 onClick={() => this.openEdit(text, record)}
-                style={ text.createUser == localStorage.getItem("userId") ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+                style={ text.createUser == localStorage.getItem("userId") && text.status == 1 ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
               >编辑</Button>
               <Button 
-                style={ (text.createUser == localStorage.getItem("userId") &&  text.status == 2)
-                || (auth === "管理员" && text.status == 3)
-                || (auth === "财务"  && text.status == 5)
+                style={ (text.createUser == localStorage.getItem("userId") &&  text.status == 9)
+                || (auth === "管理员" && text.status == 2 && localStorage.getItem("jobId") == 1)
+                || ((auth === "会计" || auth === "出纳" || auth === "财务经理") && text.status == 3)
                 ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
                 type='link'
                 onClick={() => this.getBack(text, record)}
               >撤回</Button>
               <Button  
-                style={ (auth === "管理员" && text.status == 2  ) 
+                style={ (auth === "管理员" && text.status == 9 && localStorage.getItem("jobId") == 1 ) 
                 ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
-                type='link' onClick={() => this.audit(text, record)}>业务确认</Button>
+                type='link' onClick={() => this.audit(text, record)}>业务负责人确认</Button>
                 <Button  
-                style={ (auth === "会计" && text.status == 3 
-                || localStorage.getItem("userName")==='admin' && text.status == 3  ) 
+                style={ ((auth === "会计" || auth === "出纳" || auth === "财务经理")  && text.status == 2 
+                || localStorage.getItem("userName")==='admin' && text.status == 2  ) 
                 ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
                 type='link' onClick={() => this.finance(text, record)}>财务确认</Button>
-                <Button  
-                style={ (auth === "出纳" && text.status == 5 
-                || localStorage.getItem("userName")==='admin' && text.status == 5  ) 
-                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
-                type='link' onClick={() => this.teller(text, record)}>出纳确认</Button>
-                <Button  
-                style={ (auth === "财务经理" && text.status == 6 
-                 || localStorage.getItem("userName")==='admin' && text.status == 6  ) 
-                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
-                type='link' onClick={() => this.financeManager(text, record)}>财务经理确认</Button>
-                <Button  
                 
-                style={ (auth === "管理员" && text.status == 9 ) 
-                  && text.confirmCountersignStaffPlan === localStorage.getItem("userName")
-                ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
-                type='link' onClick={() => this.countersign(text, record)}>会签</Button>
               <Button  type='link'
                onClick={() => this.remove(text, record)}
-               style={ text.createUser == localStorage.getItem("userId") ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
+               style={ (text.createUser == localStorage.getItem("userId") || auth === "管理员" ) && text.status == 1 ?{ marginRight: 16  }:{ marginRight: 16, display: "none" }}
               >删除</Button>
             </span>
           ),
@@ -328,8 +330,8 @@ export default class index extends Component {
       message.error('登录用户不是创建该订单的用户，无法编辑');
       return;
     }
-    if (text.status == 3) {
-      message.info("业务负责人审核通过,无法编辑");
+    if (text.status == 2) {
+      message.info("业务负责人已确认,无法编辑");
     } else if (text.status == 5) {
       message.info("财务负责人已确认,无法编辑");
     } else if (text.status == 6) {
@@ -366,18 +368,13 @@ export default class index extends Component {
             },
           }).then(res => {
             if (res.code && res.code === "0000") {
-              Modal.confirm({
+              Modal.success({
                 title: '撤回订单',
                 content: '撤回订单成功',
-                onOk() {
-                  that.bindSerch(that.state.searchObj);
-                },
-                oncancel() {
-                  that.bindSerch(that.state.searchObj);
-                }
               })
+              that.bindSerch(that.state.searchObj);
             } else {
-              Modal.confirm({
+              Modal.error({
                 title: '撤回订单',
                 content: `撤回订单失败,失败原因: ${res.data}:联系运维人员处理！}`,
               })
@@ -399,28 +396,40 @@ export default class index extends Component {
       this.setState({
         isSubmit: false,
       }, () => {
-        if (localStorage.getItem("roleId") == 1) {
-          if (text.status != 8) {
+        if (localStorage.getItem("roleId") == 4 || localStorage.getItem("roleId") == 5  || localStorage.getItem("roleId") == 6) {
+          if (text.status == 3) {
             this.getOrderBack(text.id);
           } else {
-            message.info("订单流程已结束，无法撤回！！！")
+            message.info("订单状态不是财务已确认，无法撤回！！！")
+          }
+        } else if (localStorage.getItem("roleId") == 1 && localStorage.getItem("jobId") == 1 && localStorage.getItem("userId") != text.createUser) {
+          if (text.status == 2) {
+            this.getOrderBack(text.id);
+          } else {
+            message.info("订单状态不是待财务确认，无法撤回！！！")
+          }
+        }else if (localStorage.getItem("roleId") == 1 && localStorage.getItem("jobId") == 1 && localStorage.getItem("userId") == text.createUser) {
+          if (text.status == 2 || text.status == 9) {
+            this.getOrderBack(text.id);
+          } else {
+            message.info("订单状态不是待财务确认或待业务负责人确认，无法撤回！！！")
           }
         } else if (localStorage.getItem("roleId") == 2) {
           if (localStorage.getItem("userId") == text.createUser) {
-            if (text.status == 2) {
+            if (text.status == 9) {
               this.getOrderBack(text.id);
             } else {
-              message.info("订单状态不是待业务确认，无法撤回！！！")
+              message.info("订单状态不是业务负责人确认，无法撤回！！！")
             }
           } else {
             message.info("不是填表人，无法撤回！！！")
           }
         } else if (localStorage.getItem("roleId") == 3) {
           if (localStorage.getItem("userId") == text.createUser) {
-            if (text.status == 2) {
+            if (text.status == 9) {
               this.getOrderBack(text.id);
             } else {
-              message.info("订单状态不是待业务确认，无法撤回！！")
+              message.info("订单状态不是待产品总监确认，无法撤回！！")
             }
           } else {
             message.info("不是填表人，无法撤回！！！")
@@ -451,14 +460,13 @@ export default class index extends Component {
         })
       })
     } 
-
   }
 
 
    /**
    * 邀请会签
    */
-  countersign = (text, record) => {
+  productDirector = (text, record) => {
     if (localStorage.getItem("roleId") == 1) {
       if (text.status == 9) {
         this.setState({
@@ -467,11 +475,11 @@ export default class index extends Component {
           this.setState({
             editObj: text,
             auditVisible: true,
-            type: "countersign",
+            type: "productDirector",
           })
         })
       } else {
-        message.error("订单状态不是“业务会签中”，不能确认")
+        message.error("订单状态不是“产品总监确认”，不能确认")
       }
     } else {
       message.error("登录账号不是管理者，不能会签")
@@ -483,14 +491,14 @@ export default class index extends Component {
    */
   audit = (text, record) => {
     if (localStorage.getItem("roleId") == 1) {
-      if (text.status == 2) {
+      if (text.status == 9) {
         this.setState({
           editObj: text
         }, () => {
           this.setState({
             editObj: text,
             auditVisible: true,
-            type: "confirm",
+            type: "productDirector",
           })
         })
       } else {
@@ -505,22 +513,22 @@ export default class index extends Component {
    * 财务确认
    */
   finance = (text, record) => {
-    if (localStorage.getItem("roleId") == 5) {
-      if (text.status == 3) {
+    if (localStorage.getItem("roleId") == 5 || localStorage.getItem("roleId") == 4 || localStorage.getItem("roleId") == 6) {
+      if (text.status == 2) {
         this.setState({
           editObj: text
         }, () => {
           this.setState({
             editObj: text,
             auditVisible: true,
-            type: "finance",
+            type: "confirm",
           })
         })
       } else {
         message.error("订单状态不是“待财务确认”，不能确认")
       }
     } else {
-      message.error("登录账号不是会计，不能确认")
+      message.error("登录账号不是财务，不能确认")
     }
   }
   
@@ -797,11 +805,12 @@ export default class index extends Component {
           title="订单管理"
           departmentOptions={this.state.departmentOptions?this.state.departmentOptions:[]}
           staffOptions={this.state.staffOptions?this.state.staffOptions:[]}
-          companyOptions={this.state.companyOptions?this.state.companyOptions:[]}
+          companyOptions={this.state.companyOptions? this.state.companyOptions:[]}
           bankOptions={this.state.bankOptions?this.state.bankOptions:[]}
           customerOptions={this.state.customerOptions?this.state.customerOptions:[]}
         />
-        <Table dataSource={this.state.list} columns={this.state.columns} loading={this.state.isLoading}
+        <ProTable dataSource={this.state.list} columns={this.state.columns} loading={this.state.isLoading}
+          search={false}
           pagination={{
             total: this.state.total, pageSize: this.state.pageSize, current: this.state.current,
             onChange: this.changePage
